@@ -9,8 +9,8 @@
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #1A120B;
+    color: #D5CEA3;
 }
 
 /* Container styles */
@@ -22,8 +22,8 @@ body {
 
 /* Header styles */
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: #1A120B;
+    color: #E5E5CB;
     padding: 20px 0;
 }
 
@@ -41,7 +41,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #fff;
+    color: #E5E5CB;
     text-decoration: none;
 }
 
@@ -51,7 +51,7 @@ nav ul li a {
     background-size: cover;
     background-position: center;
     text-align: center;
-    color: #333;
+    color: #E5E5CB;
     padding: 100px 0;
 }
 
@@ -67,8 +67,8 @@ nav ul li a {
 
 .btn {
     display: inline-block;
-    background-color: #333;
-    color: #fff;
+    background-color: #3C2A21;
+    color: #E5E5CB;
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 5px;
@@ -76,7 +76,7 @@ nav ul li a {
 }
 
 .btn:hover {
-    background-color: #555;
+    background-color: #D5CEA3;
 }
 
 /* Menu section styles */
@@ -89,6 +89,29 @@ nav ul li a {
     margin-bottom: 30px;
 }
 
+.menu .background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Letakkan gambar latar belakang di bawah konten lainnya */
+    background-image: url('images/01.jpg'); /* Ganti 'path/to/your/image.jpg' dengan path gambar Anda */
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+}
+
+.menu .background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: rgba(0, 0, 0, 0.5); /* Warna overlay hitam dengan tingkat kegelapan yang dapat disesuaikan */
+}
+
 .menu-items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -96,7 +119,7 @@ nav ul li a {
 }
 
 .menu-item {
-    background-color: #fff;
+    background-color: #3C2A21;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -115,12 +138,12 @@ nav ul li a {
 .menu-item span {
     font-size: 1.1em;
     font-weight: bold;
-    color: #333;
+    color: #E5E5CB;
 }
 
 /* About section styles */
 .about {
-    background-color: #fff;
+    background-color: #3C2A21;
     padding: 100px 0;
 }
 
@@ -138,7 +161,7 @@ nav ul li a {
 /* Contact section styles */
 .contact {
     padding: 100px 0;
-    background-color: #f9f9f9;
+    background-color: #1A120B;
 }
 
 .contact h2 {
@@ -154,8 +177,8 @@ nav ul li a {
 
 /* Footer styles */
 footer {
-    background-color: #333;
-    color: #fff;
+    background-color: #000000;
+    color: #D5CEA3;
     text-align: center;
     padding: 20px 0;
 }
