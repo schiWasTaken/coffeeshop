@@ -1,11 +1,13 @@
-/* Reset default margin and padding */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body styles */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -13,14 +15,12 @@ body {
     color: #D5CEA3;
 }
 
-/* Container styles */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Header styles */
 header {
     background-color: #1A120B;
     color: #E5E5CB;
@@ -45,14 +45,29 @@ nav ul li a {
     text-decoration: none;
 }
 
-/* Hero section styles */
 .hero {
-    background-image: url('coffee-shop.jpg'); /* Replace with your image */
+    position: relative;
+    background-image: url('images/01.jpg'); /* Replace with your image */
     background-size: cover;
     background-position: center;
     text-align: center;
-    color: #E5E5CB;
+    color: #fff;
     padding: 100px 0;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero .container {
+    position: relative;
+    z-index: 1;
 }
 
 .hero h2 {
@@ -79,7 +94,6 @@ nav ul li a {
     background-color: #D5CEA3;
 }
 
-/* Menu section styles */
 .menu {
     padding: 100px 0;
 }
@@ -87,29 +101,6 @@ nav ul li a {
 .menu h2 {
     text-align: center;
     margin-bottom: 30px;
-}
-
-.menu .background-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Letakkan gambar latar belakang di bawah konten lainnya */
-    background-image: url('images/01.jpg'); /* Ganti 'path/to/your/image.jpg' dengan path gambar Anda */
-    background-size: cover;
-    background-position: center;
-    opacity: 1;
-}
-
-.menu .background-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-color: rgba(0, 0, 0, 0.5); /* Warna overlay hitam dengan tingkat kegelapan yang dapat disesuaikan */
 }
 
 .menu-items {
@@ -141,7 +132,6 @@ nav ul li a {
     color: #E5E5CB;
 }
 
-/* About section styles */
 .about {
     background-color: #3C2A21;
     padding: 100px 0;
@@ -158,7 +148,6 @@ nav ul li a {
     margin: 0 auto;
 }
 
-/* Contact section styles */
 .contact {
     padding: 100px 0;
     background-color: #1A120B;
@@ -175,7 +164,6 @@ nav ul li a {
     margin: 0 auto;
 }
 
-/* Footer styles */
 footer {
     background-color: #000000;
     color: #D5CEA3;
@@ -186,3 +174,26 @@ footer {
 footer p {
     margin: 0;
 }
+
+#backToTopBtn {
+    display: none; /* Hide button by default */
+    position: fixed; /* Fixed position so it's always visible */
+    bottom: 20px;
+    right: 20px;
+    background-color: #3C2A21;
+    color: #fff;
+    border: none;
+    border-radius: 50%; /* Circular button */
+    cursor: pointer;
+    font-size: 24px;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#backToTopBtn:hover {
+    background-color: #E5E5CB;
+}
+
+
