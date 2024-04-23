@@ -3,8 +3,10 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const flash = require('connect-flash');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const uri = 'mongodb://localhost:27017/coffee';
@@ -18,10 +20,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-
+app.use(flash());
 // Initialize Passport and session for persistent login sessions
 app.use(passport.initialize());
 app.use(passport.session());
+app.set('view engine', 'ejs');
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -57,35 +60,35 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+// app.post('/login', async (req, res) => {
+//   const { username, password } = req.body;
 
-  // Find the user by name
-  const user = await client.db().collection('users').findOne({ username });
+//   // Find the user by name
+//   const user = await client.db().collection('users').findOne({ username });
 
-  if (!user) {
-      return res.status(404).send('User not found');
-  }
+//   if (!user) {
+//       return res.status(404).send('User not found');
+//   }
 
-  // Compare the provided password with the hashed password
-  const passwordMatch = await bcrypt.compare(password, user.hashedPassword); // Use the correct key to retrieve the hashed password
+//   // Compare the provided password with the hashed password
+//   const passwordMatch = await bcrypt.compare(password, user.hashedPassword); // Use the correct key to retrieve the hashed password
 
-  if (passwordMatch) {
-      res.send('Login successful');
-  } else {
-      res.status(401).send('Incorrect password');
-  }
-});
+//   if (passwordMatch) {
+//       res.send('Login successful');
+//   } else {
+//       res.status(401).send('Incorrect password');
+//   }
+// });
 
 
 // Configure Passport local strategy for username/password authentication
 passport.use(new LocalStrategy(async (username, password, done) => {
     try {
         // Find user by username in your database
-        const user = await User.findOne({ username });
+        const user = await client.db().collection('users').findOne({ username });
 
         // If user not found or password is incorrect, return false
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
             return done(null, false, { message: 'Incorrect username or password' });
         }
 
@@ -96,21 +99,27 @@ passport.use(new LocalStrategy(async (username, password, done) => {
     }
 }));
 
+//TODO: CONSOLE LOG BRO
 // Serialize user to store in the session
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    console.log('Serializing user:', user);
+    done(null, user._id);
 });
-
 // Deserialize user from the session
-passport.deserializeUser(async (id, done) => {
+
+passport.deserializeUser(async (_id, done) => {
     try {
+        console.log('Deserializing user ID:', _id);
         // Find user by id in your database
-        const user = await User.findById(id);
+        const objectId = new ObjectId(_id);
+        const user = await client.db().collection('users').findOne({ _id: objectId});
+        console.log('Deserialized user:', user);
         done(null, user);
     } catch (error) {
         done(error);
     }
 });
+
 
 // Middleware to protect routes that require authentication
 const isAuthenticated = (req, res, next) => {
@@ -136,8 +145,13 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
     res.send('Welcome to the dashboard!');
 });
 
+app.get('/signup', (req, res) => {
+    res.render('signup.ejs');
+});
+
 app.get('/login', (req, res) => {
-    res.send('Login form goes here');
+    // Render login form with flashed error message (if any)
+    res.render('login.ejs', { message: req.flash('error') });
 });
 
 app.listen(PORT, () => {
