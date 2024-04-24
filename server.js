@@ -6,6 +6,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const Item = require('./models/item');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
 const app = express();
@@ -15,9 +16,9 @@ const uri = 'mongodb://localhost:27017/coffee';
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }))
-// Configure session middleware
+const secretKey = crypto.randomBytes(32).toString('hex');
 app.use(session({
-    secret: 'your-secret-key',
+    secret: secretKey,
     resave: false,
     saveUninitialized: false
 }));
