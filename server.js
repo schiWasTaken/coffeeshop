@@ -4,6 +4,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
+const Item = require('./models/item');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
@@ -94,12 +95,18 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('/login');
+    req.logout({}, () => {
+        res.redirect('/login');
+    });
 });
 
-app.get('/dashboard', isAuthenticated, (req, res) => {
-    res.send('Welcome to the dashboard!');
+app.get('/dashboard', isAuthenticated, async (req, res) => {
+    
+    res.render('dashboard.ejs', { user: req.user, items: await Item.find() });
+});
+
+app.get('/', (req, res) => {
+    res.render('index.ejs');
 });
 
 app.get('/signup', (req, res) => {

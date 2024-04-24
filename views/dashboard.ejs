@@ -3,15 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>a</title>
+    <title>Coffee Shop</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+<script src="script.js"></script>
 <body>
-    <div class="login-container">
-        <h2>a</h2>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Coffee Shop</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="auth-buttons">
+                    <%= user.username %>
+                    <a href="logout" class="btn">Logout</a>
+                </div>
+            </nav>
+        </div>
+    </header>
 
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h2>Welcome to Coffee Shop</h2>
+            <p>Discover our delicious coffee and pastries</p>
+            <a href="#menu" class="btn">View Menu</a>
+        </div>
         
-        <p>halo</p>
-    </div>
+
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu">
+        <div class="container">
+            <h2>Our Menu</h2>
+            <div class="menu-items">
+                <% for (let i of items) {%>
+                    <div class="menu-item">
+                        <h3><%=i.name%></h3>
+                        <p><%=i.description%></p>
+                        <span><%=i.price%></span>
+                    </div>
+                    
+                <%}%>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Us</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ut feugiat arcu, at tincidunt turpis. Nullam vestibulum, ipsum ac tristique vehicula, lorem felis efficitur nulla, vitae blandit enim mauris a nisl.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <p>Contact information and form will be placed here</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Coffee Shop</p>
+        </div>
+    </footer>
+
+    <button id="backToTopBtn" title="Go to top">&#8593;</button>
+
 </body>
 </html>
