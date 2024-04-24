@@ -1,9 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
+const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
-const { MongoClient } = require('mongodb');
-const { ObjectId } = require('mongodb');
+const User = require('./models/user');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
@@ -26,18 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('view engine', 'ejs');
 
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-async function connectToMongoDB() {
-    try {
-        await client.connect();
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-    }
-}
-
-connectToMongoDB();
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.post('/signup', async (req, res) => {
 
@@ -48,10 +37,7 @@ app.post('/signup', async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert the user into the "users" collection with the hashed password
-      const result = await client.db().collection('users').insertOne({
-          username,
-          hashedPassword // Use a different key to store the hashed password
-      });
+      const result = await User.create({username, hashedPassword});
 
       res.status(201).send('User created successfully');
   } catch (error) {
@@ -60,32 +46,11 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// app.post('/login', async (req, res) => {
-//   const { username, password } = req.body;
-
-//   // Find the user by name
-//   const user = await client.db().collection('users').findOne({ username });
-
-//   if (!user) {
-//       return res.status(404).send('User not found');
-//   }
-
-//   // Compare the provided password with the hashed password
-//   const passwordMatch = await bcrypt.compare(password, user.hashedPassword); // Use the correct key to retrieve the hashed password
-
-//   if (passwordMatch) {
-//       res.send('Login successful');
-//   } else {
-//       res.status(401).send('Incorrect password');
-//   }
-// });
-
-
 // Configure Passport local strategy for username/password authentication
 passport.use(new LocalStrategy(async (username, password, done) => {
     try {
         // Find user by username in your database
-        const user = await client.db().collection('users').findOne({ username });
+        const user = await User.findOne({ username });
 
         // If user not found or password is incorrect, return false
         if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
@@ -99,27 +64,19 @@ passport.use(new LocalStrategy(async (username, password, done) => {
     }
 }));
 
-//TODO: CONSOLE LOG BRO
 // Serialize user to store in the session
 passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user);
     done(null, user._id);
 });
 // Deserialize user from the session
-
-passport.deserializeUser(async (_id, done) => {
+passport.deserializeUser(async (id, done) => {
     try {
-        console.log('Deserializing user ID:', _id);
-        // Find user by id in your database
-        const objectId = new ObjectId(_id);
-        const user = await client.db().collection('users').findOne({ _id: objectId});
-        console.log('Deserialized user:', user);
+        const user = await User.findById(id);
         done(null, user);
     } catch (error) {
         done(error);
     }
 });
-
 
 // Middleware to protect routes that require authentication
 const isAuthenticated = (req, res, next) => {
