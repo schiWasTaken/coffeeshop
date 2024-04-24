@@ -9,6 +9,12 @@
 <body>
     <div class="signup-container">
         <h2>Sign Up</h2>
+        <!-- Display flash messages -->
+        <% if (message.length > 0) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= message %>
+            </div>
+        <% } %>   
         <!-- Sign up form -->
         <form action="/signup" method="POST">
             <label for="username">Username:</label>

@@ -27,24 +27,30 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('view engine', 'ejs');
 
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(uri);
 
 app.post('/signup', async (req, res) => {
 
   const { username, password } = req.body;
 
   try {
+      // Check if the username is already taken
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        req.flash('error', 'Username already exists');
+        return res.redirect('/signup');
+      }
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert the user into the "users" collection with the hashed password
       const result = await User.create({username, hashedPassword});
-
-      res.status(201).send('User created successfully');
-  } catch (error) {
-      console.error('Error signing up:', error);
-      res.status(500).send('An error occurred during sign up');
-  }
+      res.redirect('/login');
+    } 
+    catch (error) {
+        console.error('Error signing up:', error);
+        res.redirect('/signup');
+    }
 });
 
 // Configure Passport local strategy for username/password authentication
@@ -87,16 +93,19 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
-// Example routes for login, logout, and protected resource
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/dashboard',
     failureRedirect: '/login',
     failureFlash: true
 }));
 
+app.get('/', async (req, res) => {
+    res.render('index.ejs', { items: await Item.find() });
+});
+
 app.get('/logout', (req, res) => {
     req.logout({}, () => {
-        res.redirect('/login');
+        res.redirect('/');
     });
 });
 
@@ -105,12 +114,8 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
     res.render('dashboard.ejs', { user: req.user, items: await Item.find() });
 });
 
-app.get('/', (req, res) => {
-    res.render('index.ejs');
-});
-
 app.get('/signup', (req, res) => {
-    res.render('signup.ejs');
+    res.render('signup.ejs', { message: req.flash('error') });
 });
 
 app.get('/login', (req, res) => {
