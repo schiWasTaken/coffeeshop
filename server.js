@@ -95,7 +95,7 @@ const isAuthenticated = (req, res, next) => {
 };
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/dashboard',
+    successRedirect: '/userHome',
     failureRedirect: '/login',
     failureFlash: true
 }));
@@ -110,9 +110,9 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.get('/dashboard', isAuthenticated, async (req, res) => {
+app.get('/userHome', isAuthenticated, async (req, res) => {
     
-    res.render('dashboard.ejs', { user: req.user, items: await Item.find() });
+    res.render('userHome.ejs', { user: req.user, items: await Item.find() });
 });
 
 app.get('/signup', (req, res) => {
