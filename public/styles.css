@@ -302,3 +302,31 @@ button, input[type="submit"], input[type="reset"] {
 	cursor: pointer;
 	outline: inherit;
 }
+
+.auth-buttons {
+    display: flex;
+    align-items: center; /* Align items vertically */
+}
+
+.auth-buttons a {
+    margin-left: 10px; /* Add margin between username and logout button */
+}
+
+.profile-header {
+    background-color: #1A120B;
+    color: #E5E5CB;
+    padding: 20px 0;
+}
+
+.profile-header h1 {
+    font-size: 2em;
+}
+
+.profile-auth-buttons {
+    display: flex;
+    align-items: center; /* Align items vertically */
+}
+
+.profile-auth-buttons a {
+    margin-left: 10px; /* Add margin between username and logout button */
+}

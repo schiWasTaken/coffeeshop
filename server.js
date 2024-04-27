@@ -124,6 +124,40 @@ app.get('/login', (req, res) => {
     res.render('login.ejs', { message: req.flash('error') });
 });
 
+app.get('/profile', (req, res) => {
+    res.render('profile.ejs', { user: req.user }); // Assuming req.user contains user information
+});
+
+// Handle renaming user
+app.post('/rename', async (req, res) => {
+    const newUsername = req.body.newUsername;
+    
+    try {
+        // Update username in the database
+        await User.findByIdAndUpdate(req.user._id, { username: newUsername });
+        res.redirect('/userHome'); // Redirect to userHome page
+    } catch (error) {
+        console.error('Error renaming user:', error);
+        res.redirect('/profile'); // Redirect back to profile page with an error message
+    }
+});
+
+// Handle deleting user
+app.post('/deleteUser', async (req, res) => {
+    try {
+        // Delete user from the database
+        await User.findByIdAndDelete(req.user._id);
+        req.logout(); // Logout the user
+        res.redirect('/login'); // Redirect to login page
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.redirect('/profile'); // Redirect back to profile page with an error message
+    }
+});
+
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
