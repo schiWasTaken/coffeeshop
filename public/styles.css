@@ -330,3 +330,19 @@ button, input[type="submit"], input[type="reset"] {
 .profile-auth-buttons a {
     margin-left: 10px; /* Add margin between username and logout button */
 }
+
+.item-count-container {
+    display: flex;
+    align-items: center;
+}
+
+.item-count-container button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.item-count-container span {
+    margin: 0 10px;
+}

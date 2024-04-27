@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const Item = require('./models/item');
+const UserCart = require('./models/userCarts');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const bodyParser = require('body-parser');
@@ -105,14 +106,13 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.logout({}, () => {
+    req.logout(() => {
         res.redirect('/');
     });
 });
 
 app.get('/userHome', isAuthenticated, async (req, res) => {
-    
-    res.render('userHome.ejs', { user: req.user, items: await Item.find() });
+    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(), });
 });
 
 app.get('/signup', (req, res) => {
@@ -147,15 +147,77 @@ app.post('/deleteUser', async (req, res) => {
     try {
         // Delete user from the database
         await User.findByIdAndDelete(req.user._id);
-        req.logout(); // Logout the user
-        res.redirect('/login'); // Redirect to login page
+        req.logout(() => {
+        });
+        res.redirect('/'); // Redirect to login page
     } catch (error) {
         console.error('Error deleting user:', error);
         res.redirect('/profile'); // Redirect back to profile page with an error message
     }
 });
 
+app.get('/api/cartItems', async (req, res) => {
+    try {
+        // Fetch cart items from the database
+        const cartItems = await UserCart.find({ userId: req.user._id });
+        
+        // Prepare the response data
+        const responseData = cartItems.reduce((acc, userCart) => {
+            acc[userCart.itemId] = userCart.quantity;
+            return acc;
+        }, {});
 
+        // Send the cart items as JSON response
+        res.json(responseData);
+    } catch (error) {
+        // Handle errors and send an error response
+        console.error('Error fetching cart items:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route to create a new cart item
+app.post('/api/cartItems', async (req, res) => {
+    try {
+        const { itemId, quantity } = req.body;
+        const userId = req.user._id;
+        const newItem = UserCart.create({ userId, itemId, quantity });
+        const savedItem = (await newItem).save();
+        res.status(201).json(savedItem);
+    } catch (error) {
+        console.error('Error creating UserCart:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route to update an existing cart item
+app.put('/api/cartItems/:itemId', async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const { quantity } = req.body;
+        const userId = req.user._id.toString();
+        const cartId = await UserCart.findOne({ userId: userId, itemId: itemId })
+        const updatedItem = await UserCart.findByIdAndUpdate(cartId, { quantity }, { new: true });
+        res.json(updatedItem);
+    } catch (error) {
+        console.error('Error updating UserCart:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route to delete an existing cart item
+app.delete('/api/cartItems/:itemId', async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const userId = req.user._id.toString();
+        const cartId = await UserCart.findOne({ userId: userId, itemId: itemId })
+        await UserCart.findByIdAndDelete(cartId);
+        res.sendStatus(204);
+    } catch (error) {
+        console.error('Error deleting UserCart:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
