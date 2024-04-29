@@ -196,6 +196,18 @@ footer p {
     background-color: #E5E5CB;
 }
 
+#checkoutButtonContainer {
+    display: none;
+    position: fixed; /* Fixed position so it's always visible */
+    bottom: 20px;
+    right: 20px;
+    font-size: 1.5em;
+}
+
+#checkoutBtn {
+    box-shadow: 0 6px 4px rgba(0, 0, 0, 0.3);
+}
+
 /* Custom styling for form inputs */
 input[type="text"],
 input[type="password"] {
@@ -297,10 +309,19 @@ button, input[type="submit"], input[type="reset"] {
 	background: none;
 	color: inherit;
 	border: none;
+    margin: auto;
 	padding: 0;
 	font: inherit;
 	cursor: pointer;
 	outline: inherit;
+}
+
+.menu .container .cart-btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em auto;
+    padding: auto;
 }
 
 .auth-buttons {
@@ -382,4 +403,8 @@ button, input[type="submit"], input[type="reset"] {
     text-decoration: none;
     cursor: pointer;
   }
-  
+
+  .quantity {
+    margin: 1em;
+    padding: 1em;
+  }

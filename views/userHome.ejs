@@ -51,20 +51,13 @@
                         <p><%=i.description%></p>
                         <span><%=i.price%></span>
                         <div class="quantity-controls">
-                            <button class="minus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">-</button>
+                            <button class="btn minus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">-</button>
                             <span class="quantity" data-item-id="<%= i._id %>" data-count="0">0</span>
-                            <button class="plus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">+</button>
+                            <button class="btn plus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">+</button>
                         </div>
                     </div>
                 <%}%>
             </div>
-        </div>
-    </section>
-
-    <!-- Shopping Cart Section -->
-    <section id="cart" class="cart">
-        <div class="container">
-            <button id="checkoutBtn" class="btn">Proceed to Checkout</button>
         </div>
     </section>
 
@@ -103,7 +96,9 @@
     </footer>
 
     <button id="backToTopBtn" title="Go to top">&#8593;</button>
-
+    <div id= "checkoutButtonContainer" class="container">
+        <button id="checkoutBtn" class="btn cart-btn">Proceed to Checkout</button>
+    </div>
     
     <script src="script.js"></script>
 </body>

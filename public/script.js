@@ -57,38 +57,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Function to fetch cart items from the server
-    function fetchCartItems() {
+    async function fetchCartItems() {
         // Make a GET request to fetch cart items
-        return fetch('/api/cartItems')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch cart items');
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateItemCounts(data);
-                return data; // Return the fetched data
-            })
-            .catch(error => {
-                console.error('Error fetching cart items:', error);
-                return null;
-            });
+        try {
+            const response = await fetch('/api/cartItems');
+            if (!response.ok) {
+                throw new Error('Failed to fetch cart items');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+            return null;
+        }
     }
 
-    
+    function extractItemQuantityPairs(cartItems) {
+        const cartItemsArray = Object.entries(cartItems).map(([key, value]) => `${key}:${value}`);
+        return cartItemsArray.map(pair => {
+            let [itemId, quantity] = pair.split(':');
+            return { itemId, quantity };
+        });
+    }
 
     // Function to update the counts of items on the page
     function updateItemCounts(cartItems) {
-        const cartItemsArray = Object.entries(cartItems).map(([key, value]) => `${key}:${value}`);
-        const itemQuantityPairs = cartItemsArray;
+        const itemQuantityPairs = extractItemQuantityPairs(cartItems);
         itemQuantityPairs.forEach(pair => {
-            console.log(cartItems);
-            let [itemId, quantity] = pair.split(':');
-            // Update the quantity of the item on the page
+            let { itemId, quantity } = pair;
             const quantityElement = document.querySelector(`.quantity[data-item-id="${String(itemId)}"]`);
             if (quantityElement) {
-                console.log(quantityElement);
                 quantityElement.textContent = quantity;
                 quantityElement.dataset.count = quantity;
             }
@@ -96,7 +94,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Call the function to fetch cart items when the page loads
-    const cartItems = fetchCartItems();
+    fetchCartItems().then(data => {
+        updateItemCounts(data);
+        updateCheckoutButtonContainer();
+    });
+    
+    function calculateTotalQuantity(itemQuantityPairs) {
+        let totalQuantity = 0;
+        itemQuantityPairs.forEach(pair => {
+            let { itemId, quantity } = pair;
+            totalQuantity += Number(quantity);
+        });
+        console.log(totalQuantity);
+        return totalQuantity;
+    }
+    
+    function updateCheckoutButtonContainer() {
+        fetchCartItems()
+            .then(data => {  
+                const itemQuantityPairs = extractItemQuantityPairs(data);
+                const totalQuantity = calculateTotalQuantity(itemQuantityPairs);
+                const checkoutButtonContainer = document.getElementById('checkoutButtonContainer');
+
+                if (totalQuantity >= 1) {
+                    // Show the checkout button container
+                    checkoutButtonContainer.style.display = 'block';
+                } else {
+                    // Hide the checkout button container
+                    checkoutButtonContainer.style.display = 'none';
+                }
+            }) 
+    }
+    
 
     // Plus minus buttons for menu
     const minusBtns = document.querySelectorAll('.minus-btn');
@@ -114,14 +143,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 quantity--;
                 quantityElement.textContent = quantity;
                 quantityElement.dataset.count = quantity;
-                updateCartItem(itemId, quantity);
-                console.log(`Item ${itemId}`);
-                console.log(`Updated ${itemName} to ${quantity}`);
+                updateCartItem(itemId, quantity)
+                .then(() => {
+                    console.log(`Item ${itemId}`);
+                    console.log(`Updated ${itemName} to ${quantity}`);
+                    updateCheckoutButtonContainer(); // Call the function after updating the cart
+                })
+                .catch(error => console.error('Error updating cart item:', error));
             }
             if (quantity <= 0) {
-                deleteCartItem(itemId);
-                console.log(`Item ${itemId}`);
-                console.log(`Removed cart data`);
+                deleteCartItem(itemId)
+                .then(() => {
+                    console.log(`Item ${itemId}`);
+                    console.log(`Removed cart data`);
+                    updateCheckoutButtonContainer(); // Call the function after updating the cart
+                })
+                .catch(error => console.error('Error deleting cart item:', error));
             }
         });
     });
@@ -140,11 +177,21 @@ document.addEventListener('DOMContentLoaded', function() {
             quantityElement.textContent = quantity;
             quantityElement.dataset.count = quantity;
             if (quantity === 1) {
-                createCartItem(itemId, quantity);
-                console.log(`Created ${itemName}`);
+                createCartItem(itemId, quantity)
+                .then(() => {
+                    console.log(`Created ${itemName}`);
+                    updateCheckoutButtonContainer(); // Call the function after updating the cart
+                })
+                .catch(error => console.error('Error creating cart item:', error));
             }
             if (quantity > 1) {
-                console.log(updateCartItem(itemId, quantity));
+                updateCartItem(itemId, quantity)
+                .then(() => {
+                    console.log(`Item ${itemId}`);
+                    console.log(`Update ${itemName} to ${quantity}`);
+                    updateCheckoutButtonContainer(); // Call the function after updating the cart
+                })
+                .catch(error => console.error('Error updating cart item:', error));
                 console.log(`Item ${itemId}`);
                 console.log(`Update ${itemName} to ${quantity}`);
             }
