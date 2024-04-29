@@ -64,28 +64,17 @@
     <!-- Shopping Cart Section -->
     <section id="cart" class="cart">
         <div class="container">
-            <a href="#checkout" class="btn">Go to Shopping Cart</a>
+            <button id="checkoutBtn" class="btn">Proceed to Checkout</button>
         </div>
     </section>
 
     <!-- Checkout Section -->
-    <section id="checkout" class="checkout">
-        <div class="container">
+    <section id="checkoutModal" class="modal checkout">
+        <div class="modal-content container">
+            <span class="close">&times;</span>
             <h2>Checkout</h2>
-            <div class="checkout-items">
-                <% items.forEach(item => { %>
-                    <% if (item.quantity > 0) { %>
-                        <div class="checkout-item">
-                            <span class="item-name"><%= item.name %></span>
-                            <span class="item-price"><%= item.price %></span>
-                            <span class="item-quantity"><%= item.quantity %></span>
-                        </div>
-                    <% } %>
-                <% }); %>
-            </div>
-            <div class="checkout-total">
-                <h3>Total:</h3>
-                <span id="checkout-total-price">$0.00</span>
+            <div id="user-cart-container" class="checkout-items">
+
             </div>
         </div>
     </section>

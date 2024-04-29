@@ -59,16 +59,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to fetch cart items from the server
     function fetchCartItems() {
         // Make a GET request to fetch cart items
-        fetch('/api/cartItems')
-            .then(response => response.json())
+        return fetch('/api/cartItems')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cart items');
+                }
+                return response.json();
+            })
             .then(data => {
-                // Update the counts of items on the page
                 updateItemCounts(data);
+                return data; // Return the fetched data
             })
             .catch(error => {
                 console.error('Error fetching cart items:', error);
+                return null;
             });
     }
+
+    
 
     // Function to update the counts of items on the page
     function updateItemCounts(cartItems) {
@@ -88,8 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Call the function to fetch cart items when the page loads
-    fetchCartItems();
+    const cartItems = fetchCartItems();
 
+    // Plus minus buttons for menu
     const minusBtns = document.querySelectorAll('.minus-btn');
     const plusBtns = document.querySelectorAll('.plus-btn');
     const quantities = document.querySelectorAll('.quantity');
@@ -124,6 +133,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemId = btn.dataset.itemId;
             const itemName = btn.dataset.itemName;
             let quantity = parseInt(quantityElement.dataset.count);
+            if (quantity >= 10) {
+                return;
+            }
             quantity++;
             quantityElement.textContent = quantity;
             quantityElement.dataset.count = quantity;
@@ -132,13 +144,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`Created ${itemName}`);
             }
             if (quantity > 1) {
-                updateCartItem(itemId, quantity);
+                console.log(updateCartItem(itemId, quantity));
                 console.log(`Item ${itemId}`);
                 console.log(`Update ${itemName} to ${quantity}`);
             }
         });
     });
 
+    // Function to fetch and update user cart data without page reload
+    function refreshUserCart() {
+        fetch('/userCart')
+            .then(response => response.text())
+            .then(html => {
+                // Replace the content of the user cart container with the updated HTML
+                document.getElementById('user-cart-container').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error refreshing user cart:', error);
+            });
+    }
+
+
+    // Checkout modal
+    let modal = document.getElementById("checkoutModal");
+    let btn = document.getElementById("checkoutBtn");
+    let span = document.getElementsByClassName("close")[0];
+    btn.onclick = function() {
+        refreshUserCart();
+        modal.style.display = "block";
+    }
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+    }
+
+    // Scroll to top
     window.onscroll = function() {scrollFunction()};
 
     function scrollFunction() {

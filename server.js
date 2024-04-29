@@ -1,4 +1,5 @@
 const express = require('express');
+const ejs = require('ejs');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
@@ -111,8 +112,45 @@ app.get('/logout', (req, res) => {
     });
 });
 
+// Function to calculate the total price of items in the user's cart
+async function calculateTotalPrice(userId) {
+    try {
+        // Fetch the user's cart items from the database
+        const userCartItems = await UserCart.find({ userId }).populate('itemId');
+
+        // Calculate the total price
+        let totalPrice = 0;
+        userCartItems.forEach(cartItem => {
+            const itemPrice = cartItem.itemId.price;
+            const itemQuantity = cartItem.quantity;
+            totalPrice += itemPrice * itemQuantity;
+        });
+
+        return totalPrice;
+    } catch (error) {
+        console.error('Error calculating total price:', error);
+        return null;
+    }
+}
+
+app.get('/userCart', async (req, res) => {
+    try {
+        // Query the user's cart to get the item IDs
+        const userId = req.user._id;
+        const userCartItems = await UserCart.find({ userId: userId }).populate('itemId');
+        const totalPrice = await calculateTotalPrice(userId);
+        // Pass the user's cart items to the EJS template
+        const html = await ejs.renderFile('./views/userCart.ejs', { userCartItems, totalPrice });
+        res.send(html);
+        // res.render('userCart.ejs', { userCartItems });
+    } catch (error) {
+        console.error('Error fetching user cart:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.get('/userHome', isAuthenticated, async (req, res) => {
-    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(), });
+    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
 });
 
 app.get('/signup', (req, res) => {
@@ -181,6 +219,16 @@ app.post('/api/cartItems', async (req, res) => {
     try {
         const { itemId, quantity } = req.body;
         const userId = req.user._id;
+        // Delete any existing ones first
+        const existingCartId = await UserCart.findOne({ userId: userId, itemId: itemId })
+        await UserCart.findByIdAndDelete(existingCartId); 
+
+        if (!Item.findById(itemId)) {
+            throw new Error('Item is invalid');
+        }
+        if (quantity > 10) {
+            throw new Error('Item quantity is capped at 10');
+        }
         const newItem = UserCart.create({ userId, itemId, quantity });
         const savedItem = (await newItem).save();
         res.status(201).json(savedItem);
@@ -197,6 +245,12 @@ app.put('/api/cartItems/:itemId', async (req, res) => {
         const { quantity } = req.body;
         const userId = req.user._id.toString();
         const cartId = await UserCart.findOne({ userId: userId, itemId: itemId })
+        if (!Item.findById(itemId)) {
+            throw new Error('Item is invalid');
+        }
+        if (quantity > 10) {
+            throw new Error('Item quantity is capped at 10');
+        }
         const updatedItem = await UserCart.findByIdAndUpdate(cartId, { quantity }, { new: true });
         res.json(updatedItem);
     } catch (error) {

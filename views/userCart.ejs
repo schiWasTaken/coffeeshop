@@ -1,0 +1,15 @@
+<ul>
+    <% userCartItems.forEach(cartItem => { %>
+        <li>
+            <% if (cartItem.itemId) { %>
+                <% const item = cartItem.itemId; %>
+                <span><%= cartItem.quantity %> <%= item.name %></span>
+
+            <% } else { %>
+                <span>Item not found</span>
+            <% } %>
+        </li>
+    <% }); %>
+    <h3>Total</h3>
+    <span>$<%= totalPrice %></span>
+</ul>
