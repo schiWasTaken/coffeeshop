@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const userDataElement = document.getElementById('user-data');
-    const userId = userDataElement.dataset.userId;
-
     async function createCartItem(itemId, quantity) {
         try {
             const response = await fetch('/api/cartItems', {
@@ -24,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function updateCartItem(itemId, quantity) {
         try {
-            const response = await fetch(`/api/cartItems/${userId, itemId}`, {
+            const response = await fetch(`/api/cartItems/${itemId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -213,22 +210,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Checkout modal
-    let modal = document.getElementById("checkoutModal");
-    let btn = document.getElementById("checkoutBtn");
-    let span = document.getElementsByClassName("close")[0];
-    btn.onclick = function() {
+    let checkoutModal = document.getElementById("checkoutModal");
+    let checkoutBtn = document.getElementById("checkoutBtn");
+    let closeSpan = document.getElementsByClassName("close")[0];
+    checkoutBtn.onclick = function() {
         refreshUserCart();
-        modal.style.display = "block";
+        checkoutModal.style.display = "block";
     }
-    span.onclick = function() {
-        modal.style.display = "none";
+    closeSpan.onclick = function() {
+        checkoutModal.style.display = "none";
     }
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
+        if (event.target == checkoutModal) {
+            checkoutModal.style.display = "none";
+        }
     }
 
     // Scroll to top

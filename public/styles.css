@@ -1,3 +1,10 @@
+:root {
+    --dark-brown:#1A120B;
+    --brown:#3C2A21;
+    --light: #D5CEA3;
+    --almost-white:#E5E5CB;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -11,8 +18,8 @@ html {
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color: #1A120B;
-    color: #D5CEA3;
+    background-color: var(--dark-brown);
+    color: var(--light);
 }
 
 .container {
@@ -22,8 +29,8 @@ body {
 }
 
 header {
-    background-color: #1A120B;
-    color: #E5E5CB;
+    background-color: var(--dark-brown);
+    color: var(--almost-white);
     padding: 20px 0;
 }
 
@@ -41,7 +48,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #E5E5CB;
+    color: var(--almost-white);
     text-decoration: none;
 }
 
@@ -82,8 +89,8 @@ nav ul li a {
 
 .btn {
     display: inline-block;
-    background-color: #3C2A21;
-    color: #E5E5CB;
+    background-color: var(--brown);
+    color: var(--almost-white);
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 5px;
@@ -91,7 +98,7 @@ nav ul li a {
 }
 
 .btn:hover {
-    background-color: #D5CEA3;
+    background-color: var(--light);
 }
 
 .menu {
@@ -110,7 +117,7 @@ nav ul li a {
 }
 
 .menu-item {
-    background-color: #3C2A21;
+    background-color: var(--brown);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -129,11 +136,11 @@ nav ul li a {
 .menu-item span {
     font-size: 1.1em;
     font-weight: bold;
-    color: #E5E5CB;
+    color: var(--almost-white);
 }
 
 .about {
-    background-color: #3C2A21;
+    background-color: var(--brown);
     padding: 100px 0;
 }
 
@@ -150,7 +157,7 @@ nav ul li a {
 
 .contact {
     padding: 100px 0;
-    background-color: #1A120B;
+    background-color: var(--dark-brown);
 }
 
 .contact h2 {
@@ -166,7 +173,7 @@ nav ul li a {
 
 footer {
     background-color: #000000;
-    color: #D5CEA3;
+    color: var(--light);
     text-align: center;
     padding: 20px 0;
 }
@@ -180,7 +187,7 @@ footer p {
     position: fixed; /* Fixed position so it's always visible */
     bottom: 20px;
     left: 20px;
-    background-color: #3C2A21;
+    background-color: var(--brown);
     color: #fff;
     border: none;
     border-radius: 50%; /* Circular button */
@@ -193,7 +200,7 @@ footer p {
 }
 
 #backToTopBtn:hover {
-    background-color: #E5E5CB;
+    background-color: var(--almost-white);
 }
 
 #checkoutButtonContainer {
@@ -260,8 +267,8 @@ input[type="password"]::placeholder {
 
 .signupbtn {
     display: inline-block;
-    background-color: #3C2A21;
-    color: #E5E5CB;
+    background-color: var(--brown);
+    color: var(--almost-white);
     padding: 10px 20px;
     margin: 20px;
     text-decoration: none;
@@ -270,13 +277,13 @@ input[type="password"]::placeholder {
 }
 
 .signupbtn:hover {
-    background-color: #D5CEA3;
+    background-color: var(--light);
 }
 
 .loginbtn {
     display: inline-block;
-    background-color: #3C2A21;
-    color: #E5E5CB;
+    background-color: var(--brown);
+    color: var(--almost-white);
     padding: 10px 20px;
     margin: 20px;
     text-decoration: none;
@@ -285,7 +292,7 @@ input[type="password"]::placeholder {
 }
 
 .loginbtn:hover {
-    background-color: #D5CEA3;
+    background-color: var(--light);
 }
 
 label {
@@ -334,8 +341,8 @@ button, input[type="submit"], input[type="reset"] {
 }
 
 .profile-header {
-    background-color: #1A120B;
-    color: #E5E5CB;
+    background-color: var(--dark-brown);
+    color: var(--almost-white);
     padding: 20px 0;
 }
 
@@ -383,7 +390,7 @@ button, input[type="submit"], input[type="reset"] {
   }
   
   .modal-content {
-    background-color: #3C2A21;
+    background-color: var(--dark-brown);
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;

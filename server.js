@@ -7,6 +7,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/user');
 const Item = require('./models/item');
 const UserCart = require('./models/userCarts');
+const Order  = require('./models/order');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const bodyParser = require('body-parser');
@@ -96,6 +97,17 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
+const isAdmin = (req, res, next) => {
+    // Assuming you have a 'role' field in your user schema
+    if (req.user && req.user.role === 'admin') {
+        // User is an admin, proceed to the next middleware or route handler
+        next();
+    } else {
+        // User is not an admin, send a forbidden error response
+        res.status(403).json({ error: 'Forbidden' });
+    }
+}
+
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/userHome',
     failureRedirect: '/login',
@@ -133,7 +145,7 @@ async function calculateTotalPrice(userId) {
     }
 }
 
-app.get('/userCart', async (req, res) => {
+app.get('/userCart', isAuthenticated, async (req, res) => {
     try {
         // Query the user's cart to get the item IDs
         const userId = req.user._id;
@@ -162,12 +174,12 @@ app.get('/login', (req, res) => {
     res.render('login.ejs', { message: req.flash('error') });
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', isAuthenticated, (req, res) => {
     res.render('profile.ejs', { user: req.user }); // Assuming req.user contains user information
 });
 
 // Handle renaming user
-app.post('/rename', async (req, res) => {
+app.post('/rename', isAuthenticated, async (req, res) => {
     const newUsername = req.body.newUsername;
     
     try {
@@ -181,7 +193,7 @@ app.post('/rename', async (req, res) => {
 });
 
 // Handle deleting user
-app.post('/deleteUser', async (req, res) => {
+app.post('/deleteUser', isAuthenticated, async (req, res) => {
     try {
         // Delete user from the database
         await User.findByIdAndDelete(req.user._id);
@@ -194,7 +206,7 @@ app.post('/deleteUser', async (req, res) => {
     }
 });
 
-app.get('/api/cartItems', async (req, res) => {
+app.get('/api/cartItems', isAuthenticated, async (req, res) => {
     try {
         // Fetch cart items from the database
         const cartItems = await UserCart.find({ userId: req.user._id });
@@ -215,7 +227,7 @@ app.get('/api/cartItems', async (req, res) => {
 });
 
 // Route to create a new cart item
-app.post('/api/cartItems', async (req, res) => {
+app.post('/api/cartItems', isAuthenticated, async (req, res) => {
     try {
         const { itemId, quantity } = req.body;
         const userId = req.user._id;
@@ -229,6 +241,9 @@ app.post('/api/cartItems', async (req, res) => {
         if (quantity > 10) {
             throw new Error('Item quantity is capped at 10');
         }
+        if (quantity < 1 || !Number.isInteger(quantity)) {
+            throw new Error('Item breaks the laws of physics');
+        }
         const newItem = UserCart.create({ userId, itemId, quantity });
         const savedItem = (await newItem).save();
         res.status(201).json(savedItem);
@@ -239,7 +254,7 @@ app.post('/api/cartItems', async (req, res) => {
 });
 
 // Route to update an existing cart item
-app.put('/api/cartItems/:itemId', async (req, res) => {
+app.put('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
     try {
         const { itemId } = req.params;
         const { quantity } = req.body;
@@ -260,7 +275,7 @@ app.put('/api/cartItems/:itemId', async (req, res) => {
 });
 
 // Route to delete an existing cart item
-app.delete('/api/cartItems/:itemId', async (req, res) => {
+app.delete('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
     try {
         const { itemId } = req.params;
         const userId = req.user._id.toString();
@@ -271,6 +286,35 @@ app.delete('/api/cartItems/:itemId', async (req, res) => {
         console.error('Error deleting UserCart:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+// Route to place order
+app.get('/api/placeOrder', isAuthenticated, async (req, res) => {
+    try {
+        const cartItems = await UserCart.find({ userId: req.user._id });
+        const userId = req.user._id;
+        const orderId = new mongoose.Types.ObjectId();
+        const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems });
+        (await newOrder).save();
+        res.redirect(`/orderSuccess?orderId=${orderId}`);
+    } catch (error) {
+        console.error('Error creating Order:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/orderSuccess', isAuthenticated, async (req, res) => {
+    try {
+        const orderId = req.query.orderId; // Get the orderId from the query parameters
+        res.render('orderSuccess', { orderId });
+    } catch (error) {
+        console.error('Error rendering orderSuccess:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/admin', isAuthenticated, isAdmin, async (req, res) => {
+    
 });
 
 app.listen(PORT, () => {
