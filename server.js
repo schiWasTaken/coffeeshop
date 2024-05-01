@@ -289,6 +289,7 @@ app.delete('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
 });
 
 // Route to place order
+// TODO: reset cart items after placing order
 app.get('/api/placeOrder', isAuthenticated, async (req, res) => {
     try {
         const cartItems = await UserCart.find({ userId: req.user._id });
@@ -314,7 +315,12 @@ app.get('/orderSuccess', isAuthenticated, async (req, res) => {
 });
 
 app.get('/admin', isAuthenticated, isAdmin, async (req, res) => {
-    
+    try {
+        res.render('admin');
+    } catch (error) {
+        console.error('Error rendering admin:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 app.listen(PORT, () => {
