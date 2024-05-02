@@ -350,14 +350,42 @@ app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
 
 app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
+        // Fetch all orders from the database
         const orderHistory = await Order.find();
-        // orderUsers maps orderHistory into pairs of id: model, 2nd argument acts as filter
-        const orderUsers = await User.find({ _id: {$in: orderHistory.map(order => order.userId)} }, "username");
-        const userData = orderUsers.reduce((acc, user) => {
+
+        // Fetch users corresponding to orderHistory
+        // and create a map of user IDs to user objects
+        const orderUsers = await User.find(
+            { _id: { $in: orderHistory.map(order => order.userId) } }, 
+            "username"
+        );
+        const userMap = orderUsers.reduce((acc, user) => {
             acc[user._id] = user;
             return acc;
         }, {});
-        res.render('admin', {orderHistory, userData});
+
+        // Extract all unique item IDs from orderHistory
+        const allItemIds = orderHistory.flatMap(order => order.items.map(item => item.itemId));
+        const uniqueItemIds = [...new Set(allItemIds)];
+
+        // Fetch items corresponding to uniqueItemIds
+        // and create a map of item IDs to item objects
+        const items = await Item.find({ _id: { $in: uniqueItemIds } });
+        const itemMap = items.reduce((acc, item) => {
+            acc[item._id] = item;
+            return acc;
+        }, {});
+
+        // Map each order's items to include the actual item data
+        const ordersWithItems = orderHistory.map(order => ({
+            ...order.toObject(),
+            items: order.items.map(item => ({
+                ...item.toObject(),
+                itemData: itemMap[item.itemId]
+            }))
+        }));
+
+        res.render('admin', {userMap, itemMap, ordersWithItems});
     } catch (error) {
         console.error('Error rendering admin:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -378,7 +406,7 @@ app.get('/api/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware,
         }
 
         // Return the updated order
-        res.status(200).json(order);
+        res.redirect('/admin');
     } catch (error) {
         console.error('Error marking order as purchased:', error);
         res.status(500).json({ error: 'Internal server error' });
