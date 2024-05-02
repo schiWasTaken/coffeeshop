@@ -204,16 +204,34 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Function to fetch and update user cart data without page reload
-    function refreshUserCart() {
-        fetch('/userCart')
-            .then(response => response.text())
-            .then(html => {
-                // Replace the content of the user cart container with the updated HTML
-                document.getElementById('user-cart-container').innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Error refreshing user cart:', error);
+    async function refreshUserCart() {
+        try {
+            const response = await fetch('/api/userCart');
+            const { userCartItems, totalPrice } = await response.json();
+            const cartItemTemplate = document.getElementById('cartItemTemplate');
+            const cartItemList = document.getElementById('cartItemList');
+            cartItemList.innerHTML = "";
+            const totalPriceElement = document.getElementById('totalPrice');
+    
+            userCartItems.forEach(cartItem => {
+                const clone = document.importNode(cartItemTemplate.content, true);
+                const quantitySpan = clone.querySelector('.count');
+                const itemNameSpan = clone.querySelector('.itemName');
+        
+                if (cartItem.itemId) {
+                    const item = cartItem.itemId;
+                    quantitySpan.textContent = `${cartItem.quantity}`;
+                    itemNameSpan.textContent = item.name;
+                } else {
+                    itemNameSpan.textContent = 'Item not found';
+                }
+        
+                cartItemList.appendChild(clone);
             });
+            totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+        } catch (error) {
+            console.error('Error refreshing user cart:', error);
+        }
     }
 
 
@@ -221,8 +239,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let checkoutModal = document.getElementById("checkoutModal");
     let checkoutBtn = document.getElementById("checkoutBtn");
     let closeSpan = document.getElementsByClassName("close")[0];
-    checkoutBtn.onclick = function() {
-        refreshUserCart();
+    checkoutBtn.onclick = async function() {
+        await refreshUserCart();
         checkoutModal.style.display = "block";
     }
     closeSpan.onclick = function() {

@@ -160,16 +160,13 @@ async function calculateTotalPrice(userId) {
     }
 }
 
-app.get('/userCart', isAuthenticatedMiddleware, async (req, res) => {
+app.get('/api/userCart', isAuthenticatedMiddleware, async (req, res) => {
     try {
         // Query the user's cart to get the item IDs
         const userId = req.user._id;
         const userCartItems = await UserCart.find({ userId: userId }).populate('itemId');
         const totalPrice = await calculateTotalPrice(userId);
-        // Pass the user's cart items to the EJS template
-        const html = await ejs.renderFile('./views/userCart.ejs', { userCartItems, totalPrice });
-        res.send(html);
-        // res.render('userCart.ejs', { userCartItems });
+        res.status(200).json({ userCartItems, totalPrice });
     } catch (error) {
         console.error('Error fetching user cart:', error);
         res.status(500).send('Internal Server Error');

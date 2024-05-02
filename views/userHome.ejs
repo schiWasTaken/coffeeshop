@@ -70,7 +70,22 @@
             <span class="close">&times;</span>
             <h2>Checkout</h2>
             <div id="user-cart-container" class="checkout-items">
-
+                <template id="cartItemTemplate">
+                    <li>
+                        <span class="count"></span>
+                        <span class="itemName"></span>
+                    </li>
+                </template>
+                
+                <ul id="cartItemList">
+                    
+                </ul>
+                <h3>Total</h3>
+                <span id="totalPrice"></span>
+                <div style="text-align:right">
+                    <button id="payWithPointsBtn" class="btn">Pay with points</button>
+                    <a href="/api/placeOrder" id="payCashBtn" class="btn">Pay with cash</a>
+                </div>              
             </div>
         </div>
     </section>
