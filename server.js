@@ -193,8 +193,10 @@ app.get('/profile', isAuthenticatedMiddleware, (req, res) => {
 // Handle renaming user
 app.post('/rename', isAuthenticatedMiddleware, async (req, res) => {
     const newUsername = req.body.newUsername;
-    
     try {
+        if (newUsername == "") {
+            throw new Error('Cannot rename user to empty string');
+        }
         // Update username in the database
         await User.findByIdAndUpdate(req.user._id, { username: newUsername });
         res.redirect('/userHome'); // Redirect to userHome page
