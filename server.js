@@ -342,7 +342,8 @@ app.get('/api/cancelOrder', isAuthenticatedMiddleware, async (req, res) => {
 app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const orderId = req.query.orderId; // Get the orderId from the query parameters
-        res.render('orderSuccess', { orderId });
+        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
+        res.render('orderSuccess', { orderId, userMap, itemMap, ordersWithTotalPrice });
     } catch (error) {
         console.error('Error rendering orderSuccess:', error);
         res.status(500).json({ error: 'Internal server error' });

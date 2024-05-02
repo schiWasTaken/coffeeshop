@@ -8,6 +8,28 @@
 </head>
 <body>
     http://localhost:3000/markOrderPurchased?orderId=<%= orderId %>
+    <section>
+        <div class="container history">
+            <% ordersWithTotalPrice.forEach(order => { %>
+                <div>
+                    <h2>Order ID: <%= order._id %></h2>
+                    <p><%=userMap[order.userId].username%></p>
+                    <ul>
+                        <% order.items.forEach(item => { %>
+                            <li><%= item.quantity %> <%= item.itemData.name %></li>
+                        <% }); %>
+                    </ul>
+                    <p>Total: $<%=order.totalPrice%></p>
+                    <% if (order.purchased) {%>
+                        <p>Resolved</p>
+                    <%}%>
+                    <% if (!order.purchased) {%>
+                        <p>Pending</p>
+                    <%}%>
+                </div>
+            <% }); %>
+        </div> 
+    </section>
 
     <div>
         <h1>Show this code to a worker to finish your order</h1>
