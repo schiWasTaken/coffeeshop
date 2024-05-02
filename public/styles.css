@@ -121,6 +121,7 @@ nav ul li a {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: grid;
 }
 
 .menu-item h3 {
@@ -211,7 +212,7 @@ footer p {
     font-size: 1.5em;
 }
 
-#checkoutBtn {
+.cart-btn {
     box-shadow: 0 6px 4px rgba(0, 0, 0, 0.3);
 }
 

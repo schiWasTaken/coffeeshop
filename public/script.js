@@ -77,6 +77,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function convertToItemQuantityPairs(itemQuantityPairs) {
+        return itemQuantityPairs.reduce((acc, { itemId, quantity }) => {
+            acc[itemId] = quantity;
+            return acc;
+        }, {});
+    }
+    
+
     // Function to update the counts of items on the page
     function updateItemCounts(cartItems) {
         const itemQuantityPairs = extractItemQuantityPairs(cartItems);
@@ -226,6 +234,30 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target == checkoutModal) {
             checkoutModal.style.display = "none";
         }
+    }
+
+    let resetBtn = document.getElementById("resetCartBtn");
+
+    async function resetCart() {
+        try {
+            const response = await fetch('/api/resetCart');
+            if (!response.ok) {
+                throw new Error('Failed to fetch cart items');
+            }
+            return response.json();
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+            return null;
+        }
+    }
+
+    resetBtn.onclick = async function() {
+        const res = await resetCart();
+        pairs = convertToItemQuantityPairs(res);
+        pairs = Object.keys(pairs).reduce((a,b)=>{a[b]=0; return a}, {});
+        console.log("res ", res);
+        updateItemCounts(pairs);
+        updateCheckoutButtonContainer();
     }
 
     // Scroll to top

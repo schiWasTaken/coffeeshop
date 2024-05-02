@@ -90,20 +90,22 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Middleware to protect routes that require authentication
-const isAuthenticated = (req, res, next) => {
+const isAuthenticatedMiddleware = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
     }
     res.redirect('/login');
 };
 
-const isAdmin = (req, res, next) => {
-    // Assuming you have a 'role' field in your user schema
-    if (req.user && req.user.role === 'admin') {
-        // User is an admin, proceed to the next middleware or route handler
-        next();
-    } else {
-        // User is not an admin, send a forbidden error response
+function isAdmin(req) {
+    return req.user && req.user.role === 'admin';
+}
+
+const isAdminMiddleware = (req, res, next) => {
+    if (isAdmin(req)) {
+        return next();
+    } 
+    else {
         res.status(403).json({ error: 'Forbidden' });
     }
 }
@@ -115,6 +117,14 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 app.get('/', async (req, res) => {
+    if (req.isAuthenticated()) {
+        if (isAdmin(req)) {
+            res.render('admin.ejs');
+            return;
+        }
+        res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
+        return;
+    }
     res.render('index.ejs', { items: await Item.find() });
 });
 
@@ -123,6 +133,7 @@ app.get('/logout', (req, res) => {
         res.redirect('/');
     });
 });
+
 
 // Function to calculate the total price of items in the user's cart
 async function calculateTotalPrice(userId) {
@@ -145,7 +156,7 @@ async function calculateTotalPrice(userId) {
     }
 }
 
-app.get('/userCart', isAuthenticated, async (req, res) => {
+app.get('/userCart', isAuthenticatedMiddleware, async (req, res) => {
     try {
         // Query the user's cart to get the item IDs
         const userId = req.user._id;
@@ -161,7 +172,7 @@ app.get('/userCart', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/userHome', isAuthenticated, async (req, res) => {
+app.get('/userHome', isAuthenticatedMiddleware, async (req, res) => {
     res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
 });
 
@@ -174,12 +185,12 @@ app.get('/login', (req, res) => {
     res.render('login.ejs', { message: req.flash('error') });
 });
 
-app.get('/profile', isAuthenticated, (req, res) => {
+app.get('/profile', isAuthenticatedMiddleware, (req, res) => {
     res.render('profile.ejs', { user: req.user }); // Assuming req.user contains user information
 });
 
 // Handle renaming user
-app.post('/rename', isAuthenticated, async (req, res) => {
+app.post('/rename', isAuthenticatedMiddleware, async (req, res) => {
     const newUsername = req.body.newUsername;
     
     try {
@@ -193,7 +204,7 @@ app.post('/rename', isAuthenticated, async (req, res) => {
 });
 
 // Handle deleting user
-app.post('/deleteUser', isAuthenticated, async (req, res) => {
+app.post('/deleteUser', isAuthenticatedMiddleware, async (req, res) => {
     try {
         // Delete user from the database
         await User.findByIdAndDelete(req.user._id);
@@ -206,7 +217,7 @@ app.post('/deleteUser', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/api/cartItems', isAuthenticated, async (req, res) => {
+app.get('/api/cartItems', isAuthenticatedMiddleware, async (req, res) => {
     try {
         // Fetch cart items from the database
         const cartItems = await UserCart.find({ userId: req.user._id });
@@ -227,7 +238,7 @@ app.get('/api/cartItems', isAuthenticated, async (req, res) => {
 });
 
 // Route to create a new cart item
-app.post('/api/cartItems', isAuthenticated, async (req, res) => {
+app.post('/api/cartItems', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const { itemId, quantity } = req.body;
         const userId = req.user._id;
@@ -237,12 +248,6 @@ app.post('/api/cartItems', isAuthenticated, async (req, res) => {
 
         if (!Item.findById(itemId)) {
             throw new Error('Item is invalid');
-        }
-        if (quantity > 10) {
-            throw new Error('Item quantity is capped at 10');
-        }
-        if (quantity < 1 || !Number.isInteger(quantity)) {
-            throw new Error('Item breaks the laws of physics');
         }
         const newItem = UserCart.create({ userId, itemId, quantity });
         const savedItem = (await newItem).save();
@@ -254,7 +259,7 @@ app.post('/api/cartItems', isAuthenticated, async (req, res) => {
 });
 
 // Route to update an existing cart item
-app.put('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
+app.put('/api/cartItems/:itemId', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const { itemId } = req.params;
         const { quantity } = req.body;
@@ -262,9 +267,6 @@ app.put('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
         const cartId = await UserCart.findOne({ userId: userId, itemId: itemId })
         if (!Item.findById(itemId)) {
             throw new Error('Item is invalid');
-        }
-        if (quantity > 10) {
-            throw new Error('Item quantity is capped at 10');
         }
         const updatedItem = await UserCart.findByIdAndUpdate(cartId, { quantity }, { new: true });
         res.json(updatedItem);
@@ -275,7 +277,7 @@ app.put('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
 });
 
 // Route to delete an existing cart item
-app.delete('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
+app.delete('/api/cartItems/:itemId', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const { itemId } = req.params;
         const userId = req.user._id.toString();
@@ -289,14 +291,17 @@ app.delete('/api/cartItems/:itemId', isAuthenticated, async (req, res) => {
 });
 
 // Route to place order
-// TODO: reset cart items after placing order
-app.get('/api/placeOrder', isAuthenticated, async (req, res) => {
+app.get('/api/placeOrder', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const cartItems = await UserCart.find({ userId: req.user._id });
+        if (cartItems.length == 0) {
+            throw new Error('Item is empty');
+        }
         const userId = req.user._id;
         const orderId = new mongoose.Types.ObjectId();
         const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems });
         (await newOrder).save();
+        await UserCart.findByIdAndDelete(cartItems);
         res.redirect(`/orderSuccess?orderId=${orderId}`);
     } catch (error) {
         console.error('Error creating Order:', error);
@@ -304,7 +309,18 @@ app.get('/api/placeOrder', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/orderSuccess', isAuthenticated, async (req, res) => {
+app.get('/api/resetCart', isAuthenticatedMiddleware, async (req, res) => {
+    try {
+        const cartItems = await UserCart.find({ userId: req.user._id });
+        await UserCart.deleteMany({ userId: req.user._id });
+        res.status(200).json(cartItems);
+    } catch (error) {
+        console.error('Error resetting cart', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const orderId = req.query.orderId; // Get the orderId from the query parameters
         res.render('orderSuccess', { orderId });
@@ -314,11 +330,32 @@ app.get('/orderSuccess', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/admin', isAuthenticated, isAdmin, async (req, res) => {
+app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
         res.render('admin');
     } catch (error) {
         console.error('Error rendering admin:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
+    try {
+        const orderId = req.query.orderId;
+        if (!orderId) {
+            return res.status(400).json({ error: 'Order ID is required' });
+        }
+
+        // Find the order by its ID and update its status
+        const order = await Order.findByIdAndUpdate(orderId, { purchased: true }, { new: true });
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Return the updated order
+        res.status(200).json(order);
+    } catch (error) {
+        console.error('Error marking order as purchased:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

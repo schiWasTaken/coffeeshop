@@ -4,15 +4,16 @@ const Schema = mongoose.Schema;
 const userCartSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'User' // Reference to the User model
+        ref: 'User', // Reference to the User model
     },
     itemId: {
         type: Schema.Types.ObjectId,
-        ref: 'Item' // Reference to the Item model
+        ref: 'Item', // Reference to the Item model
     },
     quantity: {
         type: Number,
-        default: 0
+        min: 1,     // Minimum value allowed is 1
+        max: 10     // Maximum value allowed is 10
     }
 });
 
