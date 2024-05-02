@@ -302,6 +302,10 @@ app.get('/api/placeOrder', isAuthenticatedMiddleware, async (req, res) => {
             throw new Error('Item is empty');
         }
         const userId = req.user._id;
+        const userAlreadyOrdered = await Order.findOne({ userId: userId, purchased: false });
+        if (userAlreadyOrdered != null ) {
+            throw new Error('User has a pending order');
+        }
         const orderId = new mongoose.Types.ObjectId();
         const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems });
         (await newOrder).save();
@@ -350,8 +354,8 @@ app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
 
 app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
-        // Fetch all orders from the database
-        const orderHistory = await Order.find();
+        // Fetch all orders from the database, sorted by newest first
+        const orderHistory = await Order.find().sort({ createdAt: -1 });
 
         // Fetch users corresponding to orderHistory
         // and create a map of user IDs to user objects
@@ -384,8 +388,21 @@ app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res)
                 itemData: itemMap[item.itemId]
             }))
         }));
-
-        res.render('admin', {userMap, itemMap, ordersWithItems});
+        const ordersWithTotalPrice = ordersWithItems.map(order => {
+            // Calculate total price for each order
+            let totalPrice = 0;
+            order.items.forEach(item => {
+                const currentItem = itemMap[item.itemId];
+                totalPrice += currentItem.price * item.quantity;
+            });
+        
+            // Return order object with total price
+            return {
+                ...order,
+                totalPrice: totalPrice
+            };
+        });
+        res.render('admin', {userMap, itemMap, ordersWithTotalPrice});
     } catch (error) {
         console.error('Error rendering admin:', error);
         res.status(500).json({ error: 'Internal server error' });

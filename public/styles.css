@@ -1,6 +1,7 @@
 :root {
     --dark-brown:#1A120B;
     --brown:#3C2A21;
+    --faded:#765849;
     --light: #D5CEA3;
     --almost-white:#E5E5CB;
 }
@@ -200,27 +201,6 @@ footer p {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-#pendingOrderBtn {
-    margin: auto;
-    padding: 0;
-    display: block;/* Hide button by default */
-    position: fixed; /* Fixed position so it's always visible */
-    top: 20px;
-    right: 20px;
-    background-color: var(--brown);
-    color: #fff;
-    border: 1px;
-    border-style: solid;
-    border-color: red;
-    border-radius: 50%; /* Circular button */
-    cursor: pointer;
-    font-size: 24px;
-    width: 80px;
-    height: 80px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
 #backToTopBtn:hover {
     background-color: var(--almost-white);
 }
@@ -231,6 +211,18 @@ footer p {
     bottom: 20px;
     right: 20px;
     font-size: 1.5em;
+}
+
+#pendingButtonContainer {
+    display: block;
+    position: fixed; /* Fixed position so it's always visible */
+    bottom: 20px;
+    right: 20px;
+    font-size: 1.5em;
+}
+
+#pendingOrderBtn {
+    display: block;
 }
 
 .cart-btn {
@@ -436,4 +428,8 @@ button, input[type="submit"], input[type="reset"] {
   .quantity {
     margin: 1em;
     padding: 1em;
+  }
+
+  .log.resolved {
+    color: var(--faded)
   }

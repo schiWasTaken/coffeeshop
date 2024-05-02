@@ -49,11 +49,13 @@
                         <h3><%=i.name%></h3>
                         <p><%=i.description%></p>
                         <span><%=i.price%></span>
-                        <div class="quantity-controls">
-                            <button class="btn minus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">-</button>
-                            <span class="quantity" data-item-id="<%= i._id %>" data-count="0">0</span>
-                            <button class="btn plus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">+</button>
-                        </div>
+                        <% if (order.length == 0) {%>
+                            <div class="quantity-controls">
+                                <button class="btn minus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">-</button>
+                                <span class="quantity" data-item-id="<%= i._id %>" data-count="0">0</span>
+                                <button class="btn plus-btn" data-item-id="<%= i._id %>" data-item-name="<%= i.name %>">+</button>
+                            </div>
+                        <%}%>
                     </div>
                 <%}%>
             </div>
@@ -95,12 +97,17 @@
     </footer>
 
     <button id="backToTopBtn" title="Go to top">&#8593;</button>
-    <% if (order.length != 0) {%>
-        <a href="orderSuccess?orderId=<%=order[0]._id%>" id="pendingOrderBtn">bell</a>
-    <% } %>
-    <div id= "checkoutButtonContainer" class="container">
-        <button id="resetCartBtn" class="btn cart-btn">Reset</button>
-        <button id="checkoutBtn" class="btn cart-btn">Proceed to Checkout</button>
+    
+    <div id="checkoutButtonContainer" class="container">
+        <% if (order.length == 0) {%>
+            <button id="resetCartBtn" class="btn cart-btn">Reset</button>
+            <button id="checkoutBtn" class="btn cart-btn">Proceed to Checkout</button>
+        <% } %>
+    </div>
+    <div id="pendingButtonContainer" class="container">
+        <% if (order.length != 0) {%>
+            <a href="orderSuccess?orderId=<%=order[0]._id%>" class="btn cart-btn" id="pendingOrderBtn">Pending Order</a>
+        <% } %>
     </div>
     
     <script src="script.js"></script>
