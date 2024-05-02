@@ -95,6 +95,9 @@
     </footer>
 
     <button id="backToTopBtn" title="Go to top">&#8593;</button>
+    <% if (order.length != 0) {%>
+        <a href="orderSuccess?orderId=<%=order[0]._id%>" id="pendingOrderBtn">bell</a>
+    <% } %>
     <div id= "checkoutButtonContainer" class="container">
         <button id="resetCartBtn" class="btn cart-btn">Reset</button>
         <button id="checkoutBtn" class="btn cart-btn">Proceed to Checkout</button>

@@ -242,11 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('/api/resetCart');
             if (!response.ok) {
-                throw new Error('Failed to fetch cart items');
+                throw new Error('Failed to reset cart');
             }
             return response.json();
         } catch (error) {
-            console.error('Error fetching cart items:', error);
+            console.error('Error resetting cart:', error);
             return null;
         }
     }

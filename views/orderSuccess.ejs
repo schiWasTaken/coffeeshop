@@ -1,5 +1,23 @@
-http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>
-<div>
-    <h1>Show this code to a worker to finish your order</h1>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>">
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>
+    <div>
+        <h1>Show this code to a worker to finish your order</h1>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>">
+    </div>
+    <div>
+        <a href="/api/cancelOrder" id="cancelOrderBtn" class="btn">Cancel</a>
+    </div>
+    <script>
+        
+    </script>
+</body>
+</html>
+

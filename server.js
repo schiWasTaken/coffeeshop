@@ -177,7 +177,7 @@ app.get('/userCart', isAuthenticatedMiddleware, async (req, res) => {
 });
 
 app.get('/userHome', isAuthenticatedMiddleware, async (req, res) => {
-    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
+    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(), order: await Order.find({userId: req.user._id, purchased: false})});
 });
 
 app.get('/signup', redirectUsersMiddleware, (req, res) => {
@@ -320,6 +320,20 @@ app.get('/api/resetCart', isAuthenticatedMiddleware, async (req, res) => {
         res.status(200).json(cartItems);
     } catch (error) {
         console.error('Error resetting cart', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/cancelOrder', isAuthenticatedMiddleware, async (req, res) => {
+    try {
+        const order = await Order.findOne({ userId: req.user._id, purchased: false });
+        if (order == null) {
+            throw new Error('Order already marked as purchased');
+        }
+        await Order.deleteOne({ userId: req.user._id, purchased: false });
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error cancelling order', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
