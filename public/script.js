@@ -239,12 +239,29 @@ document.addEventListener('DOMContentLoaded', function() {
     let checkoutModal = document.getElementById("checkoutModal");
     let checkoutBtn = document.getElementById("checkoutBtn");
     let closeSpan = document.getElementsByClassName("close")[0];
-    checkoutBtn.onclick = async function() {
-        await refreshUserCart();
-        checkoutModal.style.display = "block";
+    if (checkoutBtn) {
+        // Add event listener to the checkout button
+        checkoutBtn.onclick = async function() {
+            // Refresh user cart (assuming this function exists)
+            await refreshUserCart();
+            // Check if the checkout modal exists
+            if (checkoutModal) {
+                // Display the checkout modal
+                checkoutModal.style.display = "block";
+            }
+        }
     }
-    closeSpan.onclick = function() {
-        checkoutModal.style.display = "none";
+    
+    // Check if the close span exists
+    if (closeSpan) {
+        // Add event listener to the close span
+        closeSpan.onclick = function() {
+            // Check if the checkout modal exists
+            if (checkoutModal) {
+                // Hide the checkout modal
+                checkoutModal.style.display = "none";
+            }
+        }
     }
 
     // When the user clicks anywhere outside of the modal, close it
@@ -268,14 +285,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
     }
-
-    resetBtn.onclick = async function() {
-        const res = await resetCart();
-        pairs = convertToItemQuantityPairs(res);
-        pairs = Object.keys(pairs).reduce((a,b)=>{a[b]=0; return a}, {});
-        console.log("res ", res);
-        updateItemCounts(pairs);
-        updateCheckoutButtonContainer();
+    if (resetBtn) {
+        resetBtn.onclick = async function() {
+            const res = await resetCart();
+            pairs = convertToItemQuantityPairs(res);
+            pairs = Object.keys(pairs).reduce((a,b)=>{a[b]=0; return a}, {});
+            console.log("res ", res);
+            updateItemCounts(pairs);
+            updateCheckoutButtonContainer();
+        }
     }
     
     const searchInput = document.getElementById('searchInput');
