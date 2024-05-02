@@ -301,7 +301,7 @@ app.get('/api/placeOrder', isAuthenticatedMiddleware, async (req, res) => {
         const orderId = new mongoose.Types.ObjectId();
         const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems });
         (await newOrder).save();
-        await UserCart.findByIdAndDelete(cartItems);
+        await UserCart.deleteMany({ userId: req.user._id });
         res.redirect(`/orderSuccess?orderId=${orderId}`);
     } catch (error) {
         console.error('Error creating Order:', error);
