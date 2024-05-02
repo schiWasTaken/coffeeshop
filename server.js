@@ -123,7 +123,7 @@ const isAdminMiddleware = (req, res, next) => {
 }
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/userHome',
+    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
 }));
@@ -350,7 +350,14 @@ app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
 
 app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
-        res.render('admin');
+        const orderHistory = await Order.find();
+        // orderUsers maps orderHistory into pairs of id: model, 2nd argument acts as filter
+        const orderUsers = await User.find({ _id: {$in: orderHistory.map(order => order.userId)} }, "username");
+        const userData = orderUsers.reduce((acc, user) => {
+            acc[user._id] = user;
+            return acc;
+        }, {});
+        res.render('admin', {orderHistory, userData});
     } catch (error) {
         console.error('Error rendering admin:', error);
         res.status(500).json({ error: 'Internal server error' });

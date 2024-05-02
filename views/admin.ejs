@@ -1,1 +1,9 @@
-hi admin
+<%orderHistory.forEach(order => { %>
+    
+    <p><%=userData[order.userId].username%></p>
+    <p><%=order.items%></p>
+    <p><%=order.purchased%></p>
+    <p><%=order.createdAt%></p>
+    <p><%=order.updatedAt%></p>
+
+    <% }); %>

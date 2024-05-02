@@ -20,8 +20,8 @@ const orderSchema = new Schema({
     purchased: {
         type: Boolean,
         default: false // Set default value to false
-    }
-});
+    },
+}, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);
 
