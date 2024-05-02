@@ -355,53 +355,9 @@ app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
 app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
         // Fetch all orders from the database, sorted by newest first
-        const orderHistory = await Order.find().sort({ createdAt: -1 });
-
-        // Fetch users corresponding to orderHistory
-        // and create a map of user IDs to user objects
-        const orderUsers = await User.find(
-            { _id: { $in: orderHistory.map(order => order.userId) } }, 
-            "username"
-        );
-        const userMap = orderUsers.reduce((acc, user) => {
-            acc[user._id] = user;
-            return acc;
-        }, {});
-
-        // Extract all unique item IDs from orderHistory
-        const allItemIds = orderHistory.flatMap(order => order.items.map(item => item.itemId));
-        const uniqueItemIds = [...new Set(allItemIds)];
-
-        // Fetch items corresponding to uniqueItemIds
-        // and create a map of item IDs to item objects
-        const items = await Item.find({ _id: { $in: uniqueItemIds } });
-        const itemMap = items.reduce((acc, item) => {
-            acc[item._id] = item;
-            return acc;
-        }, {});
-
-        // Map each order's items to include the actual item data
-        const ordersWithItems = orderHistory.map(order => ({
-            ...order.toObject(),
-            items: order.items.map(item => ({
-                ...item.toObject(),
-                itemData: itemMap[item.itemId]
-            }))
-        }));
-        const ordersWithTotalPrice = ordersWithItems.map(order => {
-            // Calculate total price for each order
-            let totalPrice = 0;
-            order.items.forEach(item => {
-                const currentItem = itemMap[item.itemId];
-                totalPrice += currentItem.price * item.quantity;
-            });
-        
-            // Return order object with total price
-            return {
-                ...order,
-                totalPrice: totalPrice
-            };
-        });
+        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({});
+        const orderId = '66338638c4d13563409ccc60';
+        console.log(await myCoolFunction({orderId: orderId}));
         res.render('admin', {userMap, itemMap, ordersWithTotalPrice});
     } catch (error) {
         console.error('Error rendering admin:', error);
@@ -409,7 +365,23 @@ app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res)
     }
 });
 
-app.get('/api/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
+app.get('/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
+    try {
+        const orderId = req.query.orderId;
+        if (!orderId) {
+            return res.status(400).json({ error: 'Order ID is required' });
+        }
+
+        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
+        // Return the updated order
+        res.render('resolveOrder.ejs', { userMap, itemMap, ordersWithTotalPrice, orderId });
+    } catch (error) {
+        console.error('Error marking order as purchased:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
         const orderId = req.query.orderId;
         if (!orderId) {
@@ -421,8 +393,6 @@ app.get('/api/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware,
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
-
-        // Return the updated order
         res.redirect('/admin');
     } catch (error) {
         console.error('Error marking order as purchased:', error);
@@ -433,4 +403,58 @@ app.get('/api/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware,
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+async function myCoolFunction({orderId}) {
+    const orderHistory = (orderId === undefined) 
+    ? await Order.find().sort({ createdAt: -1 }) 
+    : [await Order.findById(orderId).sort({ createdAt: -1 })]
+    ;
+
+    // Fetch users corresponding to orderHistory
+    // and create a map of user IDs to user objects
+    const orderUsers = await User.find(
+        { _id: { $in: orderHistory.map(order => order.userId) } },
+        "username"
+    );
+    const userMap = orderUsers.reduce((acc, user) => {
+        acc[user._id] = user;
+        return acc;
+    }, {});
+
+    // Extract all unique item IDs from orderHistory
+    const allItemIds = orderHistory.flatMap(order => order.items.map(item => item.itemId));
+    const uniqueItemIds = [...new Set(allItemIds)];
+
+    // Fetch items corresponding to uniqueItemIds
+    // and create a map of item IDs to item objects
+    const items = await Item.find({ _id: { $in: uniqueItemIds } });
+    const itemMap = items.reduce((acc, item) => {
+        acc[item._id] = item;
+        return acc;
+    }, {});
+
+    // Map each order's items to include the actual item data
+    const ordersWithItems = orderHistory.map(order => ({
+        ...order.toObject(),
+        items: order.items.map(item => ({
+            ...item.toObject(),
+            itemData: itemMap[item.itemId]
+        }))
+    }));
+    const ordersWithTotalPrice = ordersWithItems.map(order => {
+        // Calculate total price for each order
+        let totalPrice = 0;
+        order.items.forEach(item => {
+            const currentItem = itemMap[item.itemId];
+            totalPrice += currentItem.price * item.quantity;
+        });
+
+        // Return order object with total price
+        return {
+            ...order,
+            totalPrice: totalPrice
+        };
+    });
+    return { userMap, itemMap, ordersWithTotalPrice };
+}
 

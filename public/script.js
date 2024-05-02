@@ -259,7 +259,27 @@ document.addEventListener('DOMContentLoaded', function() {
         updateItemCounts(pairs);
         updateCheckoutButtonContainer();
     }
+    
+    const searchInput = document.getElementById('searchInput');
 
+    searchInput.addEventListener('input', function(event) {
+        const searchText = event.target.value;
+        const menuItems = document.getElementsByClassName('menu-item');
+        
+        for (item of menuItems) {
+            const menuItemName = item.getElementsByClassName('menu-item-name')[0];
+            const menuItemDescription = item.getElementsByClassName('menu-item-description')[0];
+            if (menuItemName.innerText.toLowerCase().includes(searchText.toLowerCase()) || 
+                menuItemDescription.innerText.toLowerCase().includes(searchText.toLowerCase()) || 
+                searchText == "") {
+                item.dataset.hidden = "false";
+            }
+            else {
+                item.dataset.hidden = "true";
+            }
+        }
+    });
+    
     // Scroll to top
     window.onscroll = function() {scrollFunction()};
 

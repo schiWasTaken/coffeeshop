@@ -43,11 +43,13 @@
     <section id="menu" class="menu">
         <div class="container">
             <h2>Our Menu</h2>
+            <input type="text" id="searchInput" placeholder="Search items...">
+            
             <div class="menu-items">
                 <% for (let i of items) {%>
                     <div class="menu-item">
-                        <h3><%=i.name%></h3>
-                        <p><%=i.description%></p>
+                        <h3 class="menu-item-name"><%=i.name%></h3>
+                        <p class="menu-item-description"><%=i.description%></p>
                         <span><%=i.price%></span>
                         <% if (order.length == 0) {%>
                             <div class="quantity-controls">
