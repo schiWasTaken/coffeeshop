@@ -97,6 +97,18 @@ const isAuthenticatedMiddleware = (req, res, next) => {
     res.redirect('/login');
 };
 
+const redirectUsersMiddleware = async (req, res, next) => {
+    if (req.isAuthenticated()) {
+        if (isAdmin(req)) {
+            res.redirect('/admin');
+            return;
+        }
+        res.redirect('/userHome');
+        return;
+    }
+    return next();
+}
+
 function isAdmin(req) {
     return req.user && req.user.role === 'admin';
 }
@@ -116,15 +128,7 @@ app.post('/login', passport.authenticate('local', {
     failureFlash: true
 }));
 
-app.get('/', async (req, res) => {
-    if (req.isAuthenticated()) {
-        if (isAdmin(req)) {
-            res.render('admin.ejs');
-            return;
-        }
-        res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
-        return;
-    }
+app.get('/', redirectUsersMiddleware, async (req, res) => {
     res.render('index.ejs', { items: await Item.find() });
 });
 
@@ -176,11 +180,11 @@ app.get('/userHome', isAuthenticatedMiddleware, async (req, res) => {
     res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(),});
 });
 
-app.get('/signup', (req, res) => {
+app.get('/signup', redirectUsersMiddleware, (req, res) => {
     res.render('signup.ejs', { message: req.flash('error') });
 });
 
-app.get('/login', (req, res) => {
+app.get('/login', redirectUsersMiddleware, (req, res) => {
     // Render login form with flashed error message (if any)
     res.render('login.ejs', { message: req.flash('error') });
 });
