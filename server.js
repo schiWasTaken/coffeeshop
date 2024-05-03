@@ -393,8 +393,26 @@ app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async
 
         // Update user's points
         const user = await User.findById(order.userId);
+
         user.points += 10; // Add 10 points for the approved order
         await user.save(); // Save updated user data
+
+        /*
+        // Update user's points
+        const user = await User.findById(order.userId);
+        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
+
+        // Check if total price is greater than 10
+        if (ordersWithTotalPrice.totalPrice > 10) {
+            // Calculate points to add based on total price divided by 10 (rounded down)
+            const pointsFromTotalPrice = Math.floor(ordersWithTotalPrice.totalPrice / 10);
+            // Multiply points by 1 for each multiple of 10
+            pointsToAdd += pointsFromTotalPrice;
+        }
+
+        user.points += pointsToAdd; // Add calculated points for the approved order
+        await user.save(); // Save updated user data 
+        */ //FIXME
 
         res.redirect('/admin');
     } catch (error) {
