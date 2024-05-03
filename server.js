@@ -1,5 +1,4 @@
 const express = require('express');
-const ejs = require('ejs');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
@@ -356,8 +355,6 @@ app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res)
     try {
         // Fetch all orders from the database, sorted by newest first
         const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({});
-        const orderId = '66338638c4d13563409ccc60';
-        console.log(await myCoolFunction({orderId: orderId}));
         res.render('admin', {userMap, itemMap, ordersWithTotalPrice});
     } catch (error) {
         console.error('Error rendering admin:', error);

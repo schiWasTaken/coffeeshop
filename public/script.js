@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
             let { itemId, quantity } = pair;
             totalQuantity += Number(quantity);
         });
-        console.log(totalQuantity);
         return totalQuantity;
     }
     
@@ -150,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 quantityElement.dataset.count = quantity;
                 updateCartItem(itemId, quantity)
                 .then(() => {
-                    console.log(`Item ${itemId}`);
-                    console.log(`Updated ${itemName} to ${quantity}`);
+                    // console.log(`Item ${itemId}`);
+                    // console.log(`Updated ${itemName} to ${quantity}`);
                     updateCheckoutButtonContainer(); // Call the function after updating the cart
                 })
                 .catch(error => console.error('Error updating cart item:', error));
@@ -159,8 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (quantity <= 0) {
                 deleteCartItem(itemId)
                 .then(() => {
-                    console.log(`Item ${itemId}`);
-                    console.log(`Removed cart data`);
+                    // console.log(`Item ${itemId}`);
+                    // console.log(`Removed cart data`);
                     updateCheckoutButtonContainer(); // Call the function after updating the cart
                 })
                 .catch(error => console.error('Error deleting cart item:', error));
@@ -184,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (quantity === 1) {
                 createCartItem(itemId, quantity)
                 .then(() => {
-                    console.log(`Created ${itemName}`);
+                    // console.log(`Created ${itemName}`);
                     updateCheckoutButtonContainer(); // Call the function after updating the cart
                 })
                 .catch(error => console.error('Error creating cart item:', error));
@@ -192,13 +191,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (quantity > 1) {
                 updateCartItem(itemId, quantity)
                 .then(() => {
-                    console.log(`Item ${itemId}`);
-                    console.log(`Update ${itemName} to ${quantity}`);
+                    // console.log(`Item ${itemId}`);
+                    // console.log(`Update ${itemName} to ${quantity}`);
                     updateCheckoutButtonContainer(); // Call the function after updating the cart
                 })
                 .catch(error => console.error('Error updating cart item:', error));
-                console.log(`Item ${itemId}`);
-                console.log(`Update ${itemName} to ${quantity}`);
+                // console.log(`Item ${itemId}`);
+                // console.log(`Update ${itemName} to ${quantity}`);
             }
         });
     });
@@ -290,7 +289,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const res = await resetCart();
             pairs = convertToItemQuantityPairs(res);
             pairs = Object.keys(pairs).reduce((a,b)=>{a[b]=0; return a}, {});
-            console.log("res ", res);
             updateItemCounts(pairs);
             updateCheckoutButtonContainer();
         }
