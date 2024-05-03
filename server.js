@@ -1,5 +1,4 @@
 const express = require('express');
-const ejs = require('ejs');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
@@ -193,8 +192,10 @@ app.get('/profile', isAuthenticatedMiddleware, (req, res) => {
 // Handle renaming user
 app.post('/rename', isAuthenticatedMiddleware, async (req, res) => {
     const newUsername = req.body.newUsername;
-    
     try {
+        if (newUsername == "") {
+            throw new Error('Cannot rename user to empty string');
+        }
         // Update username in the database
         await User.findByIdAndUpdate(req.user._id, { username: newUsername });
         res.redirect('/userHome'); // Redirect to userHome page
@@ -354,8 +355,6 @@ app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res)
     try {
         // Fetch all orders from the database, sorted by newest first
         const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({});
-        const orderId = '66338638c4d13563409ccc60';
-        console.log(await myCoolFunction({orderId: orderId}));
         res.render('admin', {userMap, itemMap, ordersWithTotalPrice});
     } catch (error) {
         console.error('Error rendering admin:', error);
@@ -391,6 +390,12 @@ app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
+
+        // Update user's points
+        const user = await User.findById(order.userId);
+        user.points += 10; // Add 10 points for the approved order
+        await user.save(); // Save updated user data
+
         res.redirect('/admin');
     } catch (error) {
         console.error('Error marking order as purchased:', error);

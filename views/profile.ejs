@@ -12,7 +12,7 @@
             <h1>User Profile</h1>
             <div class="auth-buttons">
                 <% if (user) { %>
-                    <span>Hi, <%= user.username %>!</span>
+                    <span>Hi, <%= user.username %>! (Points: <%= user.points %>)</span> <!-- Menampilkan jumlah poin -->
                     <a href="logout" class="btn">Logout</a>
                 <% } else { %>
                     <!-- Redirect to login page if user is not logged in -->
@@ -21,7 +21,7 @@
             </div>
         </div>
     </header>
-    
+
     <div class="container">
         <!-- Add back button -->
         <a href="/userHome" class="btn">Back to User Home</a>
@@ -29,7 +29,7 @@
         <!-- Rename form -->
         <form action="/rename" method="POST">
             <label for="newUsername">New Username:</label>
-            <input type="text" id="newUsername" name="newUsername" placeholder="Enter new username">
+            <input type="text" id="newUsername" name="newUsername" placeholder="Enter new username" required>
             <input type="submit" value="Rename" class="btn">
         </form>
     
@@ -38,7 +38,6 @@
             <input type="submit" value="Delete User" class="btn" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
         </form>
     </div>
-    
     
     <footer>
         <p>&copy; 2024 Coffee Shop</p>
