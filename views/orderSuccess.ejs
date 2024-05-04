@@ -1,3 +1,9 @@
+<%
+    function formatToRupiah(amount) {
+        return "Rp " + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,11 +29,11 @@
                     <p><%=userMap[order.userId].username%></p>
                     <ul>
                         <% order.items.forEach(item => { %>
-                            <li><%= item.quantity %> <%= item.itemData.name %>: <span style="float: right">Rp. <%= item.quantity*item.itemData.price%></span></li>
+                            <li><%= item.quantity %> <%= item.itemData.name %>: <span style="float: right"><%=formatToRupiah(item.quantity*item.itemData.price)%></span></li>
                         <% }); %>
                     </ul>
                     <div style="text-align: right">
-                        <h2>Total: Rp.<%=order.totalPrice%></h2>
+                        <h2>Total: <%=formatToRupiah(order.totalPrice)%></h2>
 
                         <div class="centered">
                             <p>Show this code to a worker to finish your order</p>

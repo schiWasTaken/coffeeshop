@@ -502,13 +502,13 @@ a:visited {
 }
 
 .container.order {
-    margin-top: 30px;
-    display: table;
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
 }
 .container.order.card {
     padding: 1em;
     margin: 30px auto;
-    width: 25%;
 }
 .order h2 {
     margin-bottom: 30px;
@@ -516,4 +516,14 @@ a:visited {
 
 .centered {
     text-align: center;
+}
+
+.log {
+    margin: 1em;
+}
+
+.history {
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
 }

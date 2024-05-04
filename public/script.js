@@ -201,7 +201,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
+    function formatToRupiah(amount) {
+        return "Rp " + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+    }    
     // Function to fetch and update user cart data without page reload
     async function refreshUserCart() {
         try {
@@ -222,14 +224,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const item = cartItem.itemId;
                     quantitySpan.textContent = `${cartItem.quantity}`;
                     itemNameSpan.textContent = item.name;
-                    multipliedPriceSpan.textContent = `Rp.${item.price * cartItem.quantity}`;
+                    multipliedPriceSpan.textContent = formatToRupiah(item.price * cartItem.quantity);
                 } else {
                     itemNameSpan.textContent = 'Item not found';
                 }
         
                 cartItemList.appendChild(clone);
             });
-            totalPriceElement.textContent = `Rp.${totalPrice.toFixed(2)}`;
+            totalPriceElement.textContent = formatToRupiah(Number(totalPrice.toFixed(2)));
         } catch (error) {
             console.error('Error refreshing user cart:', error);
         }

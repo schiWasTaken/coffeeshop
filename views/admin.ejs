@@ -1,3 +1,8 @@
+<%
+function formatToRupiah(amount) {
+    return "Rp " + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +28,7 @@
             <h2>Logs</h2>
             <% ordersWithItems.forEach(order => { %>
                 <div class="log <% if (order.purchased) {%>resolved<%}%><% if (!order.purchased) {%>pending<%}%>">
-                    <h2>Order ID: <%= order._id %></h2>
+                    <h3>Order ID: <%= order._id %></h3>
                     <% if (userMap[order.userId]) { %>
                         <p><%= userMap[order.userId].username %></p>
                     <% } else { %>
@@ -31,18 +36,18 @@
                     <% } %>
                     <ul>
                         <% order.items.forEach(item => { %>
-                            <li><%= item.quantity %> <%= item.itemData.name %></li>
+                            <li><%= item.quantity %> <%= item.itemData.name %> <span style="float: right"><%=formatToRupiah(item.itemData.price)%></span></li>
                         <% }); %>
                     </ul>
-                    <p>Total: Rp.<%=order.totalPrice%></p>
+                    <h3 style="float: right">Total: <%=formatToRupiah(order.totalPrice)%></h3>
                     <% if (order.purchased) {%>
                         <p>Resolved</p>
                     <%}%>
                     <% if (!order.purchased) {%>
                         <p>Pending</p>
                     <%}%>
-                    <p><%=order.createdAt%></p>
-                    <p><%=order.updatedAt%></p>
+                    <p>Created: <%=order.createdAt%></p>
+                    <p>Updated: <%=order.updatedAt%></p>
                 </div>
             <% }); %>
         </div> 
