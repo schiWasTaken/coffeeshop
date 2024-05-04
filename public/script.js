@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-
     async function createCartItem(itemId, quantity) {
         try {
             const response = await fetch('/api/cartItems', {

@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Coffee Shop</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -37,7 +37,7 @@
 
                         <div class="centered">
                             <p>Show this code to a worker to finish your order</p>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>">
+                            <img id="qrCode" src="?orderId=<%=order._id%>">
                             <p>Order ID: <%= order._id %></p>   
                         </div>
                         <div class="centered">
@@ -50,9 +50,18 @@
             <% }); %>
         </div> 
     </section>
-
-    
-    
 </body>
+<script>
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Remove everything after the domain
+    const baseUrl = currentUrl.split('/').slice(0, 3).join('/');
+    // Construct the QR code URL with the current URL
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${baseUrl}/markOrderPurchased`;
+    // Update the src attribute of the img tag with the QR code URL
+    const qrCodeImg = document.getElementById('qrCode');
+    const endUrl = qrCodeImg.getAttribute("src");
+    qrCodeImg.src = qrCodeUrl + endUrl; 
+</script>
 </html>
 
