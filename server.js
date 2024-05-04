@@ -12,7 +12,7 @@ const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 const uri = 'mongodb://localhost:27017/coffee';
 
 app.use(express.static('public'));
