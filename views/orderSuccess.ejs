@@ -16,10 +16,10 @@
                     <p><%=userMap[order.userId].username%></p>
                     <ul>
                         <% order.items.forEach(item => { %>
-                            <li><%= item.quantity %> <%= item.itemData.name %>: $<%= item.quantity*item.itemData.price%></li>
+                            <li><%= item.quantity %> <%= item.itemData.name %>: Rp.<%= item.quantity*item.itemData.price%></li>
                         <% }); %>
                     </ul>
-                    <p>Total: $<%=order.totalPrice%></p>
+                    <p>Total: Rp.<%=order.totalPrice%></p>
                     <% if (order.purchased) {%>
                         <p>Resolved</p>
                     <%}%>

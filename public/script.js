@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
                 cartItemList.appendChild(clone);
             });
-            totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+            totalPriceElement.textContent = `Rp.${totalPrice.toFixed(2)}`;
         } catch (error) {
             console.error('Error refreshing user cart:', error);
         }
