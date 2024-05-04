@@ -35,7 +35,11 @@
     
         <!-- Delete user form -->
         <form action="/deleteUser" method="POST">
-            <input type="submit" value="Delete User" class="btn" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+            <input type="submit" value="Delete User" class="btn" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')
+            <% if (user.points > 0) {%>
+                && confirm('This will also PERMANENTLY DELETE your <%=user.points%> points! Are you really, really sure??')
+            <%}%>
+            "> 
         </form>
     </div>
     
