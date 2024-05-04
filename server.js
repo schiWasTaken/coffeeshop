@@ -393,8 +393,9 @@ app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async
 
         // Update user's points
         const user = await User.findById(order.userId);
+        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
 
-        user.points += 10; // Add 10 points for the approved order
+        user.points += Math.floor(ordersWithTotalPrice[0].totalPrice/10); // Add 10 points for the approved order
         await user.save(); // Save updated user data
 
         /*
