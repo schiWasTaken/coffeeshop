@@ -305,7 +305,8 @@ app.get('/api/placeOrder', isAuthenticatedMiddleware, async (req, res) => {
             throw new Error('User has a pending order');
         }
         const orderId = new mongoose.Types.ObjectId();
-        const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems });
+        const totalPrice = await calculateTotalPrice(userId);
+        const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems, totalPrice: totalPrice });
         (await newOrder).save();
         await UserCart.deleteMany({ userId: req.user._id });
         res.redirect(`/orderSuccess?orderId=${orderId}`);
@@ -343,8 +344,8 @@ app.get('/api/cancelOrder', isAuthenticatedMiddleware, async (req, res) => {
 app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
     try {
         const orderId = req.query.orderId; // Get the orderId from the query parameters
-        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
-        res.render('orderSuccess', { orderId, userMap, itemMap, ordersWithTotalPrice });
+        const { userMap, itemMap, ordersWithItems } = await extractOrderInformation({orderId});
+        res.render('orderSuccess', { orderId, userMap, itemMap, ordersWithItems });
     } catch (error) {
         console.error('Error rendering orderSuccess:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -354,8 +355,8 @@ app.get('/orderSuccess', isAuthenticatedMiddleware, async (req, res) => {
 app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
         // Fetch all orders from the database, sorted by newest first
-        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({});
-        res.render('admin', {userMap, itemMap, ordersWithTotalPrice});
+        const { userMap, itemMap, ordersWithItems } = await extractOrderInformation({});
+        res.render('admin', {userMap, itemMap, ordersWithItems});
     } catch (error) {
         console.error('Error rendering admin:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -369,9 +370,9 @@ app.get('/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware, asy
             return res.status(400).json({ error: 'Order ID is required' });
         }
 
-        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
+        const { userMap, itemMap, ordersWithItems } = await extractOrderInformation({orderId});
         // Return the updated order
-        res.render('resolveOrder.ejs', { userMap, itemMap, ordersWithTotalPrice, orderId });
+        res.render('resolveOrder.ejs', { userMap, itemMap, ordersWithItems, orderId });
     } catch (error) {
         console.error('Error marking order as purchased:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -393,20 +394,19 @@ app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async
 
         // Update user's points
         const user = await User.findById(order.userId);
-        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
 
-        user.points += Math.floor(ordersWithTotalPrice[0].totalPrice/10); // Add 10 points for the approved order
+        user.points += Math.floor(order.totalPrice/10); // Add 10 points for the approved order
         await user.save(); // Save updated user data
 
         /*
         // Update user's points
         const user = await User.findById(order.userId);
-        const { userMap, itemMap, ordersWithTotalPrice } = await myCoolFunction({orderId});
+        const { userMap, itemMap, ordersWithItems } = await myCoolFunction({orderId});
 
         // Check if total price is greater than 10
-        if (ordersWithTotalPrice.totalPrice > 10) {
+        if (ordersWithItems.totalPrice > 10) {
             // Calculate points to add based on total price divided by 10 (rounded down)
-            const pointsFromTotalPrice = Math.floor(ordersWithTotalPrice.totalPrice / 10);
+            const pointsFromTotalPrice = Math.floor(order.totalPrice / 10);
             // Multiply points by 1 for each multiple of 10
             pointsToAdd += pointsFromTotalPrice;
         }
@@ -426,7 +426,7 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
-async function myCoolFunction({orderId}) {
+async function extractOrderInformation({orderId}) {
     const orderHistory = (orderId === undefined) 
     ? await Order.find().sort({ createdAt: -1 }) 
     : [await Order.findById(orderId).sort({ createdAt: -1 })]
@@ -463,20 +463,20 @@ async function myCoolFunction({orderId}) {
             itemData: itemMap[item.itemId]
         }))
     }));
-    const ordersWithTotalPrice = ordersWithItems.map(order => {
-        // Calculate total price for each order
-        let totalPrice = 0;
-        order.items.forEach(item => {
-            const currentItem = itemMap[item.itemId];
-            totalPrice += currentItem.price * item.quantity;
-        });
+    // const ordersWithTotalPrice = ordersWithItems.map(order => {
+    //     // Calculate total price for each order
+    //     let totalPrice = 0;
+    //     order.items.forEach(item => {
+    //         const currentItem = itemMap[item.itemId];
+    //         totalPrice += currentItem.price * item.quantity;
+    //     });
 
-        // Return order object with total price
-        return {
-            ...order,
-            totalPrice: totalPrice
-        };
-    });
-    return { userMap, itemMap, ordersWithTotalPrice };
+    //     // Return order object with total price
+    //     return {
+    //         ...order,
+    //         totalPrice: totalPrice
+    //     };
+    // });
+    return { userMap, itemMap, ordersWithItems };
 }
 

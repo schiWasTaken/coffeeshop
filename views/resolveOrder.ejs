@@ -20,7 +20,7 @@
 
     <section>
         <div class="container history">
-            <% ordersWithTotalPrice.forEach(order => { %>
+            <% ordersWithItems.forEach(order => { %>
                 <div>
                     <h2>Order ID: <%= order._id %></h2>
                     <p><%=userMap[order.userId].username%></p>

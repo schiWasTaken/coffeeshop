@@ -17,6 +17,7 @@ const orderSchema = new Schema({
             max: 10     // Maximum value allowed is 10
         },
     }],
+    totalPrice: Number,
     purchased: {
         type: Boolean,
         default: false // Set default value to false
