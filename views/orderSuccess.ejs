@@ -7,38 +7,46 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    http://localhost:3000/markOrderPurchased?orderId=<%= orderId %>
+    <!-- http://localhost:3000/markOrderPurchased?orderId=<%= orderId %> -->
     <section>
-        <div class="container history">
+        <div class="container card order">
             <% ordersWithItems.forEach(order => { %>
-                <div>
-                    <h2>Order ID: <%= order._id %></h2>
+                <div class="container">
+                    <div class="centered">
+                        <% if (order.purchased) {%>
+                            <h2>Order Resolved</h2>
+                        <%}%>
+                        <% if (!order.purchased) {%>
+                            <h2>Order Pending</h2>
+                        <%}%>
+                    </div>
                     <p><%=userMap[order.userId].username%></p>
                     <ul>
                         <% order.items.forEach(item => { %>
-                            <li><%= item.quantity %> <%= item.itemData.name %>: Rp.<%= item.quantity*item.itemData.price%></li>
+                            <li><%= item.quantity %> <%= item.itemData.name %>: <span style="float: right">Rp. <%= item.quantity*item.itemData.price%></span></li>
                         <% }); %>
                     </ul>
-                    <p>Total: Rp.<%=order.totalPrice%></p>
-                    <% if (order.purchased) {%>
-                        <p>Resolved</p>
-                    <%}%>
-                    <% if (!order.purchased) {%>
-                        <p>Pending</p>
-                    <%}%>
+                    <div style="text-align: right">
+                        <h2>Total: Rp.<%=order.totalPrice%></h2>
+
+                        <div class="centered">
+                            <p>Show this code to a worker to finish your order</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>">
+                            <p>Order ID: <%= order._id %></p>   
+                        </div>
+                        <div class="centered">
+                            <a href="/api/cancelOrder" id="cancelOrderBtn" class="btn light-btn">Cancel Order</a>
+                            <a href="/" class="btn light-btn">Back to Home</a>
+                        </div>
+                    </div>
+                    
                 </div>
             <% }); %>
         </div> 
     </section>
 
-    <div>
-        <h1>Show this code to a worker to finish your order</h1>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:3000/api/markOrderPurchased?orderId=<%= orderId %>">
-    </div>
-    <div>
-        <a href="/api/cancelOrder" id="cancelOrderBtn" class="btn">Cancel Order</a>
-        <a href="/" class="btn">Back to Home</a>
-    </div>
+    
+    
 </body>
 </html>
 

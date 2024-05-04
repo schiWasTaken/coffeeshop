@@ -1,6 +1,7 @@
 :root {
     --dark-brown:#1A120B;
     --brown:#3C2A21;
+    --light-brown: #6d4d3d;
     --faded:#765849;
     --light: #D5CEA3;
     --almost-white:#E5E5CB;
@@ -79,6 +80,7 @@ nav ul li a {
 }
 
 .hero h2 {
+    color: var(--almost-white);
     font-size: 3em;
     margin-bottom: 20px;
 }
@@ -93,13 +95,20 @@ nav ul li a {
     background-color: var(--brown);
     color: var(--almost-white);
     padding: 10px 20px;
+    margin: 10px;
     text-decoration: none;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn:hover {
     background-color: var(--light);
+    color: var(--dark-brown);
+}
+
+.disabled-btn:hover {
+    background-color: inherit;
+    color: inherit;
 }
 
 .menu {
@@ -208,9 +217,11 @@ footer p {
 #checkoutButtonContainer {
     display: none;
     position: fixed; /* Fixed position so it's always visible */
-    bottom: 20px;
-    right: 20px;
+    bottom: 0.5em;
+    right: 0;
+    left: 50%;
     font-size: 1.5em;
+    text-align: right;
 }
 
 #pendingButtonContainer {
@@ -232,12 +243,20 @@ footer p {
 /* Custom styling for form inputs */
 input[type="text"],
 input[type="password"] {
-    width: calc(100% - 16px); /* Adjusted width to account for padding */
-    padding: 10px; /* Increased padding for better input field appearance */
+    width: calc(100% - 20px); /* Adjusted width to account for padding */
+    padding: 1em; /* Increased padding for better input field appearance */
     margin-bottom: 20px; /* Increased margin for better separation */
     border: 1px solid #ccc;
     border-radius: 5px;
     outline: none; /* Remove default focus outline */
+    background-color: var(--dark-brown);
+    color: var(--light);
+    border-color: var(--light);
+}
+
+::placeholder {
+    color: var(--light);
+    opacity: 1;
 }
 
 input[type="text"]:focus,
@@ -248,7 +267,7 @@ input[type="password"]:focus {
 /* Style for placeholder text */
 input[type="text"]::placeholder,
 input[type="password"]::placeholder {
-    color: #999; /* Placeholder text color */
+    color: var(--light); /* Placeholder text color */
 }
 
 .auth-buttons {
@@ -279,33 +298,19 @@ input[type="password"]::placeholder {
     max-width: 300px;
 }
 
-.signupbtn {
-    display: inline-block;
-    background-color: var(--brown);
-    color: var(--almost-white);
-    padding: 10px 20px;
+.signup-btn {
     margin: 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
 }
 
-.signupbtn:hover {
+.signup-btn:hover {
     background-color: var(--light);
 }
 
-.loginbtn {
-    display: inline-block;
-    background-color: var(--brown);
-    color: var(--almost-white);
-    padding: 10px 20px;
+.login-btn {
     margin: 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
 }
 
-.loginbtn:hover {
+.login-btn:hover {
     background-color: var(--light);
 }
 
@@ -327,11 +332,8 @@ label {
 }
 
 button, input[type="submit"], input[type="reset"] {
-	background: none;
-	color: inherit;
 	border: none;
     margin: auto;
-	padding: 0;
 	font: inherit;
 	cursor: pointer;
 	outline: inherit;
@@ -391,8 +393,10 @@ button, input[type="submit"], input[type="reset"] {
 
 
 /* CSS for the modal */
-    .modal {
-    display: none; /* Hidden by default */
+.modal {
+    display: none;
+    align-items: center;
+    justify-content: center;
     position: fixed;
     z-index: 1;
     left: 0;
@@ -400,40 +404,116 @@ button, input[type="submit"], input[type="reset"] {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-  }
-  
-  .modal-content {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 1em;
+}
+
+.modal-content {
     background-color: var(--dark-brown);
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-  }
-  
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .close:hover,
-  .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
+    border-radius: 1em; /* Add border-radius for rounded corners */
+}
 
-  .quantity {
-    margin: 1em;
+.modal-content ul li {
+    list-style-type: none;
+}
+
+.close {
+color: var(--light);
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+color: var(--faded);
+text-decoration: none;
+cursor: pointer;
+}
+
+.quantity {
+margin: 1em;
+padding: 1em;
+}
+
+.log.resolved {
+color: var(--faded);
+}
+
+[data-hidden="true"] {
+display: none;
+}
+
+.input-container {   
+    text-align: right;
+}
+.input-container input {   
+    margin: 1em 0px 1em 1.5em;
+}
+
+input[type="submit"].delete-btn {
+    border: 1px solid;
+    border-color: red;
+    color: red;
+}
+
+input[type="submit"].delete-btn:hover {
+    color: inherit;
+    background-color: red;
+}
+
+.quantity-controls {
+    text-align: center;
+}
+
+.a:link {
+    color: var(--light);
+}
+a:visited {
+    color: var(--light);
+}
+
+.card {
+    background-color: var(--brown);
     padding: 1em;
-  }
+    margin: 1em;
+    border-radius: 1em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flexbox;
+}
 
-  .log.resolved {
-    color: var(--faded);
-  }
+.card h1, .card p, .card input {
+    margin: 10px;
+}
 
-  [data-hidden="true"] {
-    display: none;
+.light-btn {
+    background-color: var(--light-brown);
+}
+
+.light-btn:hover {
+    background-color: var(--light);
+    color: var(--dark-brown);
+}
+
+#cartItemList li {
+    margin: 1em;
+}
+
+.container.order {
+    margin-top: 30px;
+    display: table;
+}
+.container.order.card {
+    padding: 1em;
+    margin: 30px auto;
+    width: 25%;
+}
+.order h2 {
+    margin-bottom: 30px;
+}
+
+.centered {
+    text-align: center;
 }

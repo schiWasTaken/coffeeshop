@@ -186,15 +186,20 @@ app.get('/login', redirectUsersMiddleware, (req, res) => {
 });
 
 app.get('/profile', isAuthenticatedMiddleware, (req, res) => {
-    res.render('profile.ejs', { user: req.user }); // Assuming req.user contains user information
+    res.render('profile.ejs', { user: req.user, message: req.flash('error') }); // Assuming req.user contains user information
 });
 
 // Handle renaming user
 app.post('/rename', isAuthenticatedMiddleware, async (req, res) => {
     const newUsername = req.body.newUsername;
+    const existingUser = await User.findOne({ username: newUsername });
     try {
         if (newUsername == "") {
             throw new Error('Cannot rename user to empty string');
+        }
+        if (existingUser) {
+            req.flash('error', 'Username already exists');
+            throw new Error('Username already exists');
         }
         // Update username in the database
         await User.findByIdAndUpdate(req.user._id, { username: newUsername });
@@ -204,6 +209,50 @@ app.post('/rename', isAuthenticatedMiddleware, async (req, res) => {
         res.redirect('/profile'); // Redirect back to profile page with an error message
     }
 });
+
+// Define route handler for /changePassword
+app.post('/changePassword', isAuthenticatedMiddleware, async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        const userId = req.user._id;
+
+        // Check if newPassword and confirmPassword match
+        if (newPassword !== confirmPassword) {
+            req.flash('error', 'New password and confirm password do not match');
+            return res.redirect('/profile'); // Redirect to changePassword page
+        }
+
+        // Find the user by userId
+        const user = await User.findById(userId);
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/profile'); // Redirect to changePassword page
+        }
+
+        // Verify if the current password matches the stored password
+        const passwordMatch = await bcrypt.compare(currentPassword, user.hashedPassword);
+        if (!passwordMatch) {
+            req.flash('error', 'Current password is incorrect');
+            return res.redirect('/profile'); // Redirect to changePassword page
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password with the new one
+        user.hashedPassword = hashedPassword;
+        await user.save();
+
+        // Password changed successfully
+        req.flash('success', 'Password changed successfully');
+        return res.redirect('/'); // Redirect to home page or any other appropriate page
+    } catch (error) {
+        console.error('Error changing password:', error);
+        req.flash('error', 'Internal server error');
+        return res.redirect('/profile'); // Redirect to changePassword page
+    }
+});
+
 
 // Handle deleting user
 app.post('/deleteUser', isAuthenticatedMiddleware, async (req, res) => {

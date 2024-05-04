@@ -20,6 +20,7 @@
 
     <section>
         <div class="container history">
+            <h2>Logs</h2>
             <% ordersWithItems.forEach(order => { %>
                 <div class="log <% if (order.purchased) {%>resolved<%}%><% if (!order.purchased) {%>pending<%}%>">
                     <h2>Order ID: <%= order._id %></h2>

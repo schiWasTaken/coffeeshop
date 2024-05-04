@@ -7,44 +7,64 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="profile-header">
+    <header id="home">
         <div class="container">
-            <h1>User Profile</h1>
-            <div class="auth-buttons">
-                <% if (user) { %>
-                    <span>Hi, <%= user.username %>! (Points: <%= user.points %>)</span> <!-- Menampilkan jumlah poin -->
+            <h1>Coffee Shop</h1>
+            <nav>
+                <ul>
+                    <li><a href="/#home">Home</a></li>
+                    <li><a href="/#menu">Menu</a></li>
+                    <li><a href="/#about">About</a></li>
+                    <li><a href="/#contact">Contact</a></li>
+                </ul>
+                <div class="auth-buttons">
+                    
+                    <span class="btn disabled-btn"><%= user.username%> (<%= user.points %> pts)</span>
                     <a href="logout" class="btn">Logout</a>
-                <% } else { %>
-                    <!-- Redirect to login page if user is not logged in -->
-                    <a href="/login" class="btn">Login</a>
-                <% } %>
-            </div>
+                </div>
+            </nav>
         </div>
     </header>
+    <section>
+        <div class="container">
+            <h1 style="text-align: center;">Edit profile</h1>   
+            <!-- Display flash messages -->
+            <% if (message.length > 0) { %>
+                <div class="alert alert-danger" role="alert" style="text-align: center; padding: 1em">
+                    <%= message %>
+                </div>
+            <% } %>       
+            <!-- Rename form -->
+            <form action="/rename" method="POST" class="card">
+                <label for="newUsername"><h1>Change username</h1></label>
+                <input type="text" id="newUsername" name="newUsername" placeholder="Enter new username" required>
+                <div class="input-container">
+                    <input type="submit" value="Rename" class="btn light-btn">
+                </div>
+            </form>
+            <form action="/changePassword" method="POST" class="card">
+                <label for="changePassword"><h1>Change password</h1></label>
+                <input type="password" id="changePassword" name="currentPassword" placeholder="Enter current password" required>
+                <input type="password" id="changePassword" name="newPassword" placeholder="Enter new password" required>
+                <input type="password" id="changePassword" name="confirmPassword" placeholder="Confirm new password" required>
+                <div class="input-container">
+                    <input type="submit" value="Change password" class="btn light-btn">
+                </div>
+            </form>
 
-    <div class="container">
-        <!-- Add back button -->
-        <a href="/userHome" class="btn">Back to User Home</a>
-        
-        <!-- Rename form -->
-        <form action="/rename" method="POST">
-            <label for="newUsername">New Username:</label>
-            <input type="text" id="newUsername" name="newUsername" placeholder="Enter new username" required>
-            <input type="submit" value="Rename" class="btn">
-        </form>
-    
-        <!-- Delete user form -->
-        <form action="/deleteUser" method="POST">
-            <input type="submit" value="Delete User" class="btn" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')
-            <% if (user.points > 0) {%>
-                && confirm('This will also PERMANENTLY DELETE your <%=user.points%> points! Are you really, really sure??')
-            <%}%>
-            "> 
-        </form>
-    </div>
-    
-    <footer>
-        <p>&copy; 2024 Coffee Shop</p>
-    </footer>
+            <!-- Delete user form -->
+            <form action="/deleteUser" method="POST" class="card">
+                <h1>Danger zone</h1>
+                <p>Deleting user will also delete acquired points from the database, this action cannot be undone.</p>
+                <div class="input-container">
+                    <input type="submit" value="Delete User" class="btn delete-btn" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')
+                    <% if (user.points > 0) {%>
+                        && confirm('This will also PERMANENTLY DELETE your <%=user.points%> points! Are you really, really sure??')
+                    <%}%>
+                    "> 
+                </div>
+            </form>
+        </div>
+    </section>
 </body>
 </html>

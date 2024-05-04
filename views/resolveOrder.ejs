@@ -7,41 +7,35 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Coffee Shop</h1>
-            <nav>
-                <div class="auth-buttons">
-                    <a href="logout" class="btn">Logout</a>
-                </div>
-            </nav>
-        </div>
-    </header>
-
     <section>
-        <div class="container history">
+        <div class="container card order">
             <% ordersWithItems.forEach(order => { %>
-                <div>
-                    <h2>Order ID: <%= order._id %></h2>
+                <div class="container">
+                    <div class="centered">
+                        <h2>Order ID: <%= order._id %></h2>
+                    </div>
                     <p><%=userMap[order.userId].username%></p>
                     <ul>
                         <% order.items.forEach(item => { %>
-                            <li><%= item.quantity %> <%= item.itemData.name %>: Rp<%= item.quantity*item.itemData.price%></li>
+                            <li><%= item.quantity %> <%= item.itemData.name %>: <span style="float: right">Rp. <%= item.quantity*item.itemData.price%></span></li>
                         <% }); %>
                     </ul>
-                    <p>Total: Rp.<%=order.totalPrice%></p>
+                    <div style="text-align: right">
+                        <h2>Total: Rp.<%=order.totalPrice%></h2>
+                    </div>
+                </div>
+                <div class="centered">
+                    <a href="/" class="btn light-btn">Back</a>
                     <% if (order.purchased) {%>
-                        <p>Resolved</p>
+                        <span class="btn disabled-btn">Already Resolved</span>
                     <%}%>
                     <% if (!order.purchased) {%>
-                        <p>Pending</p>
+                        <a href="/api/resolveOrder?orderId=<%=orderId%>" class="btn light-btn">Confirm Order</a>
                     <%}%>
-                    <p><%=order.createdAt%></p>
-                    <p><%=order.updatedAt%></p>
                 </div>
             <% }); %>
         </div> 
     </section>
-    <a href="/api/resolveOrder?orderId=<%=orderId%>" class="btn">Confirm</a>
+    
 </body>
 </html>

@@ -9,7 +9,7 @@
 
 <body>
     <!-- Header -->
-    <header>
+    <header id="home">
         <div class="container">
             <h1>Coffee Shop</h1>
             <nav>
@@ -20,8 +20,7 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="auth-buttons">
-                    <a href="/profile" class="username-link">Hi, <%= user.username %>!</a>
-                    <%= user.points %> points
+                    <a href="/profile" class="btn"><%= user.username%> (<%= user.points %> pts)</a>
                     <a href="logout" class="btn">Logout</a>
                 </div>
             </nav>
@@ -29,7 +28,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="hero">
+    <section class="hero">
         <div class="container">
             <h2>Welcome to Coffee Shop</h2>
             <p>Discover our delicious coffee and pastries</p>
@@ -68,21 +67,24 @@
     <!-- Checkout Section -->
     <section id="checkoutModal" class="modal checkout">
         <div class="modal-content container">
-            <span class="close">&times;</span>
+            <!-- <span class="close">&times;</span> -->
             <h2>Checkout</h2>
             <div id="user-cart-container" class="checkout-items">
                 <template id="cartItemTemplate">
                     <li>
                         <span class="count"></span>
                         <span class="itemName"></span>
+                        <span class="multipliedPrice" style="float:right"></span>
                     </li>
                 </template>
                 
                 <ul id="cartItemList">
                     
                 </ul>
-                <h3>Total</h3>
-                <span id="totalPrice"></span>
+                <div class="container" style="text-align:right">
+                    <h2>Total</h2>
+                    <h2 id="totalPrice"></h2>
+                </div>
                 <div style="text-align:right">
                     <button id="payWithPointsBtn" class="btn">Pay with points</button>
                     <a href="/api/placeOrder" id="payCashBtn" class="btn">Pay with cash</a>
@@ -118,8 +120,8 @@
     
     <div id="checkoutButtonContainer" class="container">
         <% if (order.length == 0) {%>
-            <button id="resetCartBtn" class="btn cart-btn">Reset</button>
-            <button id="checkoutBtn" class="btn cart-btn">Proceed to Checkout</button>
+            <button id="resetCartBtn" class="btn light-btn">Reset</button>
+            <button id="checkoutBtn" class="btn light-btn">Proceed to Checkout</button>
         <% } %>
     </div>
     <div id="pendingButtonContainer" class="container">

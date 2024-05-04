@@ -216,11 +216,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const clone = document.importNode(cartItemTemplate.content, true);
                 const quantitySpan = clone.querySelector('.count');
                 const itemNameSpan = clone.querySelector('.itemName');
+                const multipliedPriceSpan = clone.querySelector('.multipliedPrice');
         
                 if (cartItem.itemId) {
                     const item = cartItem.itemId;
                     quantitySpan.textContent = `${cartItem.quantity}`;
                     itemNameSpan.textContent = item.name;
+                    multipliedPriceSpan.textContent = `Rp.${item.price * cartItem.quantity}`;
                 } else {
                     itemNameSpan.textContent = 'Item not found';
                 }
@@ -246,7 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if the checkout modal exists
             if (checkoutModal) {
                 // Display the checkout modal
-                checkoutModal.style.display = "block";
+                checkoutModal.style.display = "flex";
+                
             }
         }
     }
