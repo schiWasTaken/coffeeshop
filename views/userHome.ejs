@@ -32,7 +32,13 @@
             </nav>
         </div>
     </header>
-
+    <div class="container">
+        <% if (message.length > 0) { %>
+            <div class="centered alert alert-danger" role="alert">
+                <h2>ERROR: <%= message %></h2>
+            </div>
+        <% } %>     
+    </div>
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -74,7 +80,7 @@
     <section id="checkoutModal" class="modal checkout">
         <div class="modal-content container">
             <!-- <span class="close">&times;</span> -->
-            <h2>Checkout</h2>
+            <h2>Checkout</h2>   
             <div id="user-cart-container" class="checkout-items">
                 <template id="cartItemTemplate">
                     <li>
@@ -92,7 +98,7 @@
                     <h2 id="totalPrice"></h2>
                 </div>
                 <div style="text-align:right">
-                    <a href="/api/payWithPoints" id="payWithPointsBtn" class="btn">Pay with points</a>
+                    <a href="/api/placeOrder?paidWithPoints=true" id="payWithPointsBtn" class="btn">Pay with points</a>
                     <a href="/api/placeOrder" id="payCashBtn" class="btn">Pay with cash</a>
                 </div>              
             </div>

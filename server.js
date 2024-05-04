@@ -173,7 +173,7 @@ app.get('/api/userCart', isAuthenticatedMiddleware, async (req, res) => {
 });
 
 app.get('/userHome', isAuthenticatedMiddleware, async (req, res) => {
-    res.render('userHome.ejs', { user: req.user, items: await Item.find(), userCarts: await UserCart.find(), order: await Order.find({userId: req.user._id, purchased: false})});
+    res.render('userHome.ejs', { message: req.flash('error'), user: req.user, items: await Item.find(), userCarts: await UserCart.find(), order: await Order.find({userId: req.user._id, purchased: false})});
 });
 
 app.get('/signup', redirectUsersMiddleware, (req, res) => {
@@ -344,62 +344,35 @@ app.delete('/api/cartItems/:itemId', isAuthenticatedMiddleware, async (req, res)
 // Route to place order
 app.get('/api/placeOrder', isAuthenticatedMiddleware, async (req, res) => {
     try {
+        const paidWithPointsQuery = req.query.paidWithPoints;
         const cartItems = await UserCart.find({ userId: req.user._id });
         if (cartItems.length == 0) {
             throw new Error('Item is empty');
         }
         const userId = req.user._id;
+        const user = await User.findById(userId);
+        const totalPrice = await calculateTotalPrice(userId);
+        if (user.points < totalPrice && paidWithPointsQuery) {
+            req.flash('error', 'Insufficient points');
+            throw new Error('Insufficient points');
+        }
         const userAlreadyOrdered = await Order.findOne({ userId: userId, purchased: false });
         if (userAlreadyOrdered != null ) {
             throw new Error('User has a pending order');
         }
         const orderId = new mongoose.Types.ObjectId();
-        const totalPrice = await calculateTotalPrice(userId);
+        
         const newOrder = Order.create({ _id: orderId, userId: userId, items: cartItems, totalPrice: totalPrice });
+        if (paidWithPointsQuery) {
+            (await newOrder).paidWithPoints = true;
+        }
         (await newOrder).save();
         await UserCart.deleteMany({ userId: req.user._id });
         res.redirect(`/orderSuccess?orderId=${orderId}`);
     } catch (error) {
         console.error('Error creating Order:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.redirect('/');
     }
-});
-
-app.get('/api/payWithPoints', isAuthenticatedMiddleware, async (req, res) => {
-    try {
-        const cartItems = await UserCart.find({ userId: req.user._id });
-        if (cartItems.length == 0) {
-            throw new Error('Item is empty');
-        }
-        const userId = req.user._id;
-        const userAlreadyOrdered = await Order.findOne({ userId: userId, purchased: false });
-        if (userAlreadyOrdered != null ) {
-            throw new Error('User has a pending order');
-        }
-        
-        // Calculate the total price of items in the cart
-        const totalPrice = await calculateTotalPrice(req.user._id);
-
-        // Check if user has enough points
-        const user = await User.findById(req.user._id);
-        if (user.points < 10) {
-            return res.status(400).json({ error: 'Insufficient points to complete the purchase' });
-        }
-
-        // Create order
-        const orderId = new mongoose.Types.ObjectId();
-        const newOrder = await Order.create({ _id: orderId, userId: req.user._id, items: cartItems, totalPrice: totalPrice });
-        await newOrder.save();
-
-        // Clear user's cart
-        await UserCart.deleteMany({ userId: req.user._id });
-
-        // Redirect to order success page
-        res.redirect(`/orderSuccess?orderId=${orderId}`);
-        } catch (error) {
-            console.error('Error processing payment with points:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
 });
 
 app.get('/api/resetCart', isAuthenticatedMiddleware, async (req, res) => {
@@ -477,19 +450,22 @@ app.get('/api/resolveOrder', isAuthenticatedMiddleware, isAdminMiddleware, async
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
-
+        const user = await User.findById(order.userId);
         // Update user's points if paid with points
         if (order.paidWithPoints) {
             // Find the user and check if they have sufficient points
-            const user = await User.findById(order.userId);
-            if (user.points >= 10) {
+            if (user.points >= order.totalPrice) {
                 // Deduct 10 points for each item purchased with points
-                user.points -=  10;
+                user.points -= order.totalPrice;
                 await user.save();
             } else {
-                console.log('Insufficient points to deduct:', user.username);
+                throw new Error('User has insufficient points??');
                 // Handle insufficient points scenario based on your application logic
             }
+        }
+        else {
+            user.points += Math.floor(order.totalPrice / 20);
+            await user.save();
         }
 
         res.redirect('/admin');
