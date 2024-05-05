@@ -25,8 +25,15 @@
                             <li><%= item.quantity %> <%= item.itemData.name %>: <span style="float: right"><%= formatToRupiah(item.quantity*item.itemData.price)%></span></li>
                         <% }); %>
                     </ul>
-                    <div style="text-align: right">
-                        <h2>Total: <%=formatToRupiah(order.totalPrice)%></h2>
+                    <div>
+                        <% if (order.paidWithPoints) {%>
+                            <h2 style="text-align: right">Total: <%=order.totalPrice%> pts</h2>
+                            <h3 class="centered">User is paying with <%=order.totalPrice%> points.</h3>
+                        <%}%>
+                        <% if (!order.paidWithPoints) {%>
+                            <h2 style="text-align: right">Total: <%=formatToRupiah(order.totalPrice)%></h2>
+                            <h3 class="centered">User is paying with cash.</h3>
+                        <%}%>
                     </div>
                 </div>
                 <div class="centered">

@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => {
             const quantityElement = quantities[index];
             const itemId = btn.dataset.itemId;
-            const itemName = btn.dataset.itemName;
             let quantity = parseInt(quantityElement.dataset.count);
             if (quantity > 0) {
                 quantity--;
@@ -172,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => {
             const quantityElement = quantities[index];
             const itemId = btn.dataset.itemId;
-            const itemName = btn.dataset.itemName;
             let quantity = parseInt(quantityElement.dataset.count);
             if (quantity >= 10) {
                 return;

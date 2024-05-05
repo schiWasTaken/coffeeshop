@@ -39,7 +39,14 @@ function formatToRupiah(amount) {
                             <li><%= item.quantity %> <%= item.itemData.name %> <span style="float: right"><%=formatToRupiah(item.itemData.price)%></span></li>
                         <% }); %>
                     </ul>
-                    <h3 style="float: right">Total: <%=formatToRupiah(order.totalPrice)%></h3>
+                    <% if (order.paidWithPoints) {%>
+                        <h3 style="float: right">Total: <%=order.totalPrice%> pts</h3>
+                        <h3>User is paying with points.</h3>
+                    <%}%>
+                    <% if (!order.paidWithPoints) {%>
+                        <h3 style="float: right">Total: <%=formatToRupiah(order.totalPrice)%></h3>
+                        <h3>User is paying with cash.</h3>
+                    <%}%>
                     <% if (order.purchased) {%>
                         <p>Resolved</p>
                     <%}%>
