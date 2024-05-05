@@ -1,0 +1,45 @@
+[{
+  "name": "Espresso",
+  "description": "A strong, concentrated coffee made by forcing hot water through finely-ground coffee beans.",
+  "price": "16000"
+},
+{
+  "name": "Cappuccino",
+  "description": "A coffee drink that is composed of double espresso, hot milk, and steamed milk foam.",
+  "price": "18000"
+},
+{
+  "name": "Latte",
+  "description": "A coffee drink made with espresso and steamed milk.",
+  "price": "19000"
+},
+{
+  "name": "Mocha",
+  "description": "A coffee drink made with espresso, hot milk, and chocolate syrup.",
+  "price": "21000"
+},
+{
+  "name": "Americano",
+  "description": "A coffee drink made with espresso and hot water.",
+  "price": "16000"
+},
+{
+  "name": "Iced Coffee",
+  "description": "Chilled coffee served over ice cubes.",
+  "price": "18000"
+},
+{
+  "name": "Cinnamon Roll",
+  "description": "A sweet roll served commonly in Northern Europe and North America.",
+  "price": "12000"
+},
+{
+  "name": "Blueberry Muffin",
+  "description": "A type of semi-sweet cake or quick bread that is baked in portions appropriate for one person.",
+  "price": "16000"
+},
+{
+  "name": "Croissant",
+  "description": "A buttery, flaky, pastry named for its well-known crescent shape.",
+  "price": "14000"
+}]
