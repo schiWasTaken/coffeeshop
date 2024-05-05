@@ -11,7 +11,6 @@
     <title>Coffee Shop</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<script src="script.js"></script>
 <body>
     <!-- Header -->
     <header>
@@ -48,14 +47,14 @@
     <section id="menu" class="menu">
         <div class="container">
             <h2>Our Menu</h2>
+            <input type="text" id="searchInput" placeholder="Search items...">
             <div class="menu-items">
                 <% for (let i of items) {%>
                     <div class="menu-item">
-                        <h3><%=i.name%></h3>
-                        <p><%=i.description%></p>
+                        <h3 class="menu-item-name"><%=i.name%></h3>
+                        <p class="menu-item-description"><%=i.description%></p>
                         <span><%=formatToRupiah(i.price)%></span>
                     </div>
-                    
                 <%}%>
             </div>
         </div>
@@ -86,5 +85,6 @@
 
     <button id="backToTopBtn" title="Go to top">&#8593;</button>
 
+    <script src="script.js"></script>
 </body>
 </html>
