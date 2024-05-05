@@ -422,7 +422,7 @@ app.get('/admin', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res)
     }
 });
 
-app.get('/markOrderPurchased', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
+app.get('/resolveOrderConfirmation', isAuthenticatedMiddleware, isAdminMiddleware, async (req, res) => {
     try {
         const orderId = req.query.orderId;
         if (!orderId) {

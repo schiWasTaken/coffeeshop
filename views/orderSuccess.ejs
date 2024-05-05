@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- http://localhost:3000/markOrderPurchased?orderId=<%= orderId %> -->
+    <!-- http://localhost:3000/resolveOrderConfirmation?orderId=<%= orderId %> -->
     <section>
         <div class="container card order">
             <% ordersWithItems.forEach(order => { %>
@@ -63,7 +63,7 @@
     // Remove everything after the domain
     const baseUrl = currentUrl.split('/').slice(0, 3).join('/');
     // Construct the QR code URL with the current URL
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${baseUrl}/markOrderPurchased`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${baseUrl}/resolveOrderConfirmation`;
     // Update the src attribute of the img tag with the QR code URL
     const qrCodeImg = document.getElementById('qrCode');
     const endUrl = qrCodeImg.getAttribute("src");
