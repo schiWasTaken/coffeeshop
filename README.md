@@ -6,3 +6,8 @@ Import coffee.items.json to your MongoDB to render menu items properly
 To create admin, manually change role: "admin" in MongoDB
 
 ![image](https://github.com/schiWasTaken/coffeeshop/assets/20739822/7a986e40-8d59-49eb-81e5-4795a5089855)
+
+
+## Screenshot:
+
+![width_800](https://github.com/user-attachments/assets/225c2da2-5a65-4c13-8308-654860c6c274)
